@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>专业音频调音台模拟器 - 完整版</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(90deg, #ff8a00, #e52e71);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+        }
+
+        .mode-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, #ff8a00, #e52e71);
+            color: white;
+            box-shadow: 0 0 15px rgba(255, 138, 0, 0.5);
+        }
+
+        .mode-btn:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+            color: #a0a0c0;
+        }
+
+        .mode-btn:not(.active):hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .mixer-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .channels-section {
+            flex: 3;
+            min-width: 0;
+        }
+
+        .channels-container {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding: 10px 5px;
+        }
+
+        .channel {
+            background: rgba(30, 30, 46, 0.9);
+            border-radius: 8px;
+            padding: 15px;
+            width: 140px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .channel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .channel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .channel-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #ff8a00;
+        }
+
+        .channel-meter {
+            width: 8px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .channel-meter-level {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(to top, #00ff00, #ffff00, #ff0000);
+            transition: height 0.1s;
+            height: 0%;
+        }
+
+        .channel-controls {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .input-source {
+            margin-bottom: 10px;
+        }
+
+        .drop-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 10px 5px;
+            text-align: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.7rem;
+            height: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .drop-zone:hover {
+            border-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .drop-zone p {
+            margin: 2px 0;
+        }
+
+        .drop-zone .file-icon {
+            font-size: 1rem;
+            margin-bottom: 5px;
+            color: #4CAF50;
+        }
+
+        .mic-btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border: none;
+            color: white;
+            padding: 6px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+            font-size: 0.7rem;
+            margin: 5px auto 0;
+            cursor: pointer;
+            border-radius: 15px;
+            transition: all 0.3s;
+            width: 90%;
+        }
+
+        .mic-btn:hover {
+            background: linear-gradient(135deg, #2980b9, #3498db);
+            transform: scale(1.05);
+        }
+
+        .mic-btn.active {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .control-group {
+            margin-bottom: 10px;
+        }
+
+        .control-label {
+            font-size: 0.75rem;
+            color: #a0a0c0;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .fader {
+            height: 120px;
+            width: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+
+        .fader-track {
+            width: 6px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            position: relative;
+        }
+
+        .fader-thumb {
+            width: 20px;
+            height: 12px;
+            background: #ff8a00;
+            border-radius: 3px;
+            position: absolute;
+            left: -7px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .knob {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .knob-dial {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #333;
+            border: 2px solid #555;
+            position: relative;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .knob-indicator {
+            width: 2px;
+            height: 15px;
+            background: #ff8a00;
+            position: absolute;
+            top: 3px;
+            left: 50%;
+            transform: translateX(-50%);
+            transform-origin: bottom center;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .channel-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 6px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.7rem;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.3s;
+            flex: 1;
+            margin: 0 2px;
+        }
+
+        .channel-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .channel-btn.active {
+            background: #ff8a00;
+        }
+
+        .master-section {
+            flex: 1;
+            min-width: 350px;
+            background: rgba(30, 30, 46, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .master-controls {
+            flex: 1;
+        }
+
+        .master-title {
+            color: #ff8a00;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        .master-fader {
+            height: 200px;
+            width: 60px;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+
+        .master-fader-track {
+            width: 10px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .master-fader-thumb {
+            width: 30px;
+            height: 20px;
+            background: #ff8a00;
+            border-radius: 5px;
+            position: absolute;
+            left: -10px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .eq-section {
+            margin-bottom: 25px;
+        }
+
+        .eq-title {
+            color: #3498db;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .eq-bands {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .eq-band {
+            text-align: center;
+        }
+
+        .filter-section {
+            margin-bottom: 25px;
+        }
+
+        .filter-title {
+            color: #9b59b6;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .filter-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .filter-slider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-slider label {
+            font-size: 0.8rem;
+            width: 60px;
+        }
+
+        .filter-slider input {
+            flex: 1;
+        }
+
+        .gain-section {
+            margin-bottom: 25px;
+        }
+
+        .gain-title {
+            color: #2ecc71;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .gain-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .gain-slider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .gain-slider label {
+            font-size: 0.8rem;
+            width: 60px;
+        }
+
+        .gain-slider input {
+            flex: 1;
+        }
+
+        .transport-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .transport-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .play-btn {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+        }
+
+        .play-btn:hover {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            transform: scale(1.05);
+        }
+
+        .stop-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .stop-btn:hover {
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+            transform: scale(1.05);
+        }
+
+        .status-bar {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-active {
+            background: #2ecc71;
+            box-shadow: 0 0 10px #2ecc71;
+        }
+
+        .status-inactive {
+            background: #e74c3c;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #a0a0c0;
+            font-size: 0.9rem;
+        }
+
+        /* 专业模式特定样式 */
+        .pro-mode .channel {
+            width: 160px;
+        }
+
+        .pro-mode .control-label {
+            font-size: 0.7rem;
+        }
+
+        .pro-mode .channel-btn {
+            font-size: 0.65rem;
+            padding: 5px 8px;
+        }
+
+        .pro-mode .drop-zone {
+            font-size: 0.6rem;
+            height: 45px;
+        }
+
+        .pro-mode .mic-btn {
+            font-size: 0.65rem;
+            padding: 5px 8px;
+        }
+
+        /* 新手模式特定样式 */
+        .beginner-mode .channel {
+            width: 180px;
+        }
+
+        .beginner-mode .control-label {
+            font-size: 0.8rem;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .mixer-container {
+                flex-direction: column;
+            }
+            
+            .channels-container {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .channel {
+                width: 150px;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .mode-selector {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>专业音频调音台模拟器</h1>
+            <div class="mode-selector">
+                <button class="mode-btn active" id="beginner-mode-btn">新手模式</button>
+                <button class="mode-btn" id="pro-mode-btn">专业模式</button>
+            </div>
+        </header>
+
+        <div class="mixer-container beginner-mode" id="mixer-container">
+            <div class="channels-section">
+                <div class="channels-container" id="channels-container">
+                    <!-- 通道将通过JavaScript动态生成 -->
+                </div>
+            </div>
+            
+            <div class="master-section">
+                <h2 class="master-title">主控</h2>
+                <div class="master-controls">
+                    <div class="control-group">
+                        <div class="control-label">主音量</div>
+                        <div class="master-fader">
+                            <div class="master-fader-track">
+                                <div class="master-fader-thumb" id="master-fader-thumb" style="top: 30%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-section">
+                        <h3 class="filter-title">滤波器</h3>
+                        <div class="filter-controls">
+                            <div class="filter-slider">
+                                <label for="filter-freq">频率:</label>
+                                <input type="range" min="20" max="20000" value="1000" id="filter-freq">
+                                <span id="filter-freq-value">1000 Hz</span>
+                            </div>
+                            <div class="filter-slider">
+                                <label for="filter-q">Q值:</label>
+                                <input type="range" min="0.1" max="10" value="1" step="0.1" id="filter-q">
+                                <span id="filter-q-value">1.0</span>
+                            </div>
+                            <div class="filter-slider">
+                                <label for="filter-type">类型:</label>
+                                <select id="filter-type">
+                                    <option value="lowpass">低通</option>
+                                    <option value="highpass">高通</option>
+                                    <option value="bandpass">带通</option>
+                                    <option value="lowshelf">低架</option>
+                                    <option value="highshelf">高架</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="eq-section">
+                        <h3 class="eq-title">均衡器</h3>
+                        <div class="eq-bands">
+                            <div class="eq-band">
+                                <div class="control-label">低频</div>
+                                <div class="fader">
+                                    <div class="fader-track">
+                                        <div class="fader-thumb" id="eq-low-thumb" style="top: 50%;"></div>
+                                    </div>
+                                </div>
+                                <span id="eq-low-value">0 dB</span>
+                            </div>
+                            <div class="eq-band">
+                                <div class="control-label">中频</div>
+                                <div class="fader">
+                                    <div class="fader-track">
+                                        <div class="fader-thumb" id="eq-mid-thumb" style="top: 50%;"></div>
+                                    </div>
+                                </div>
+                                <span id="eq-mid-value">0 dB</span>
+                            </div>
+                            <div class="eq-band">
+                                <div class="control-label">高频</div>
+                                <div class="fader">
+                                    <div class="fader-track">
+                                        <div class="fader-thumb" id="eq-high-thumb" style="top: 50%;"></div>
+                                    </div>
+                                </div>
+                                <span id="eq-high-value">0 dB</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="gain-section">
+                        <h3 class="gain-title">增益</h3>
+                        <div class="gain-controls">
+                            <div class="gain-slider">
+                                <label for="master-gain">增益:</label>
+                                <input type="range" min="-20" max="20" value="0" id="master-gain">
+                                <span id="master-gain-value">0 dB</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="transport-controls">
+                        <button class="transport-btn play-btn" id="play-btn">
+                            <i class="fas fa-play"></i> 播放全部
+                        </button>
+                        <button class="transport-btn stop-btn" id="stop-btn">
+                            <i class="fas fa-stop"></i> 停止全部
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-indicator status-active" id="audio-status"></div>
+                <span id="audio-status-text">音频系统: 就绪</span>
+            </div>
+            <div class="status-item">
+                <div class="status-indicator status-inactive" id="playback-status"></div>
+                <span id="playback-status-text">播放状态: 停止</span>
+            </div>
+            <div class="status-item">
+                <span>活动通道: <span id="active-channels">0</span>/8</span>
+            </div>
+            <div class="status-item">
+                <span>采样率: 48kHz | 位深度: 24-bit</span>
+            </div>
+        </div>
+
+        <footer>
+            <p>专业音频调音台模拟器 &copy; 2023 | 支持多通道混音、均衡器、滤波器和录音功能</p>
+        </footer>
+    </div>
+
+    <script>
+        // 全局变量
+        let audioContext;
+        let masterGainNode;
+        let filterNode;
+        let eqLowNode, eqMidNode, eqHighNode;
+        let isPlaying = false;
+        let channels = {};
+        let currentMode = 'beginner';
+        
+        // 删除录音相关的全局变量
+        let mediaRecorder;
+        let recordedChunks = [];
+        let isRecording = false;
+        let recordingStartTime;
+        let recordingTimer;
+        let recordedClips = [];
+
+        // 初始化音频上下文
+        function initAudio() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // 创建主增益节点
+                masterGainNode = audioContext.createGain();
+                masterGainNode.gain.value = 0.8;
+                
+                // 创建滤波器
+                filterNode = audioContext.createBiquadFilter();
+                filterNode.type = 'lowpass';
+                filterNode.frequency.value = 1000;
+                filterNode.Q.value = 1;
+                
+                // 创建EQ节点
+                eqLowNode = audioContext.createBiquadFilter();
+                eqLowNode.type = 'lowshelf';
+                eqLowNode.frequency.value = 250;
+                eqLowNode.gain.value = 0;
+                
+                eqMidNode = audioContext.createBiquadFilter();
+                eqMidNode.type = 'peaking';
+                eqMidNode.frequency.value = 1000;
+                eqMidNode.Q.value = 1;
+                eqMidNode.gain.value = 0;
+                
+                eqHighNode = audioContext.createBiquadFilter();
+                eqHighNode.type = 'highshelf';
+                eqHighNode.frequency.value = 4000;
+                eqHighNode.gain.value = 0;
+                
+                // 连接节点: 滤波器 -> EQ -> 主增益 -> 输出
+                filterNode.connect(eqLowNode);
+                eqLowNode.connect(eqMidNode);
+                eqMidNode.connect(eqHighNode);
+                eqHighNode.connect(masterGainNode);
+                masterGainNode.connect(audioContext.destination);
+                
+                // 初始化所有通道
+                for (let i = 1; i <= 8; i++) {
+                    const channelId = `ch${i}`;
+                    channels[channelId] = {
+                        audioBuffer: null,
+                        source: null,
+                        gainNode: null,
+                        panNode: null,
+                        analyser: null,
+                        isMuted: false,
+                        isSolo: false,
+                        isPlaying: false,
+                        isMic: false,
+                        file: null,
+                        eqLowNode: null,
+                        eqMidNode: null,
+                        eqHighNode: null,
+                        filterNode: null
+                    };
+                    
+                    // 创建分析器用于电平表
+                    channels[channelId].analyser = audioContext.createAnalyser();
+                    channels[channelId].analyser.fftSize = 32;
+                    
+                    // 创建通道EQ节点
+                    channels[channelId].eqLowNode = audioContext.createBiquadFilter();
+                    channels[channelId].eqLowNode.type = 'lowshelf';
+                    channels[channelId].eqLowNode.frequency.value = 250;
+                    channels[channelId].eqLowNode.gain.value = 0;
+                    
+                    channels[channelId].eqMidNode = audioContext.createBiquadFilter();
+                    channels[channelId].eqMidNode.type = 'peaking';
+                    channels[channelId].eqMidNode.frequency.value = 1000;
+                    channels[channelId].eqMidNode.Q.value = 1;
+                    channels[channelId].eqMidNode.gain.value = 0;
+                    
+                    channels[channelId].eqHighNode = audioContext.createBiquadFilter();
+                    channels[channelId].eqHighNode.type = 'highshelf';
+                    channels[channelId].eqHighNode.frequency.value = 4000;
+                    channels[channelId].eqHighNode.gain.value = 0;
+                    
+                    // 创建通道滤波器
+                    channels[channelId].filterNode = audioContext.createBiquadFilter();
+                    channels[channelId].filterNode.type = 'lowpass';
+                    channels[channelId].filterNode.frequency.value = 1000;
+                    channels[channelId].filterNode.Q.value = 1;
+                }
+                
+                updateAudioStatus(true, "音频系统: 就绪");
+                console.log("音频系统初始化成功");
+                
+                // 初始化主控推子
+                initMasterFader();
+                
+                // 初始化滤波器控制
+                initFilterControls();
+                
+                // 初始化EQ控制
+                initEQControls();
+                
+                // 初始化增益控制
+                initGainControls();
+            } catch (error) {
+                console.error("音频系统初始化失败:", error);
+                updateAudioStatus(false, "音频系统: 错误");
+            }
+        }
+
+        // 初始化主控推子
+        function initMasterFader() {
+            const faderThumb = document.getElementById('master-fader-thumb');
+            const track = document.querySelector('.master-fader-track');
+            
+            let isDragging = false;
+            
+            const updateThumbPosition = (y) => {
+                const trackRect = track.getBoundingClientRect();
+                let newTop = y - trackRect.top;
+                
+                // 限制在轨道范围内
+                newTop = Math.max(0, Math.min(newTop, trackRect.height));
+                
+                // 更新拇指位置
+                faderThumb.style.top = `${newTop}px`;
+                
+                // 计算值（0-1）
+                const value = 1 - (newTop / trackRect.height);
+                
+                // 更新主增益
+                masterGainNode.gain.value = value;
+            };
+            
+            faderThumb.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                e.preventDefault();
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    updateThumbPosition(e.clientY);
+                }
+            });
+            
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+            
+            track.addEventListener('click', (e) => {
+                updateThumbPosition(e.clientY);
+            });
+        }
+
+        // 初始化滤波器控制
+        function initFilterControls() {
+            const filterFreq = document.getElementById('filter-freq');
+            const filterQ = document.getElementById('filter-q');
+            const filterType = document.getElementById('filter-type');
+            const filterFreqValue = document.getElementById('filter-freq-value');
+            const filterQValue = document.getElementById('filter-q-value');
+            
+            filterFreq.addEventListener('input', (e) => {
+                filterNode.frequency.value = e.target.value;
+                filterFreqValue.textContent = `${e.target.value} Hz`;
+            });
+            
+            filterQ.addEventListener('input', (e) => {
+                filterNode.Q.value = e.target.value;
+                filterQValue.textContent = e.target.value;
+            });
+            
+            filterType.addEventListener('change', (e) => {
+                filterNode.type = e.target.value;
+            });
+        }
+
+        // 初始化EQ控制
+        function initEQControls() {
+            const eqLowThumb = document.getElementById('eq-low-thumb');
+            const eqMidThumb = document.getElementById('eq-mid-thumb');
+            const eqHighThumb = document.getElementById('eq-high-thumb');
+            const eqLowValue = document.getElementById('eq-low-value');
+            const eqMidValue = document.getElementById('eq-mid-value');
+            const eqHighValue = document.getElementById('eq-high-value');
+            
+            // 低频EQ控制
+            initEQFader(eqLowThumb, eqLowNode, eqLowValue, -20, 20);
+            
+            // 中频EQ控制
+            initEQFader(eqMidThumb, eqMidNode, eqMidValue, -20, 20);
+            
+            // 高频EQ控制
+            initEQFader(eqHighThumb, eqHighNode, eqHighValue, -20, 20);
+        }
+        
+        // 初始化EQ推子
+        function initEQFader(thumb, node, valueDisplay, min, max) {
+            const track = thumb.parentElement;
+            
+            let isDragging = false;
+            
+            const updateThumbPosition = (y) => {
+                const trackRect = track.getBoundingClientRect();
+                let newTop = y - trackRect.top;
+                
+                // 限制在轨道范围内
+                newTop = Math.max(0, Math.min(newTop, trackRect.height));
+                
+                // 更新拇指位置
+                thumb.style.top = `${newTop}px`;
+                
+                // 计算值（min-max）
+                const valueRange = max - min;
+                const value = min + (valueRange * (1 - (newTop / trackRect.height)));
+                
+                // 更新EQ节点增益
+                node.gain.value = value;
+                
+                // 更新显示值
+                valueDisplay.textContent = `${value > 0 ? '+' : ''}${value.toFixed(1)} dB`;
+            };
+            
+            thumb.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                e.preventDefault();
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    updateThumbPosition(e.clientY);
+                }
+            });
+            
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+            
+            track.addEventListener('click', (e) => {
+                updateThumbPosition(e.clientY);
+            });
+        }
+
+        // 初始化增益控制
+        function initGainControls() {
+            const masterGain = document.getElementById('master-gain');
+            const masterGainValue = document.getElementById('master-gain-value');
+            
+            masterGain.addEventListener('input', (e) => {
+                const db = parseInt(e.target.value);
+                masterGainValue.textContent = `${db > 0 ? '+' : ''}${db} dB`;
+                
+                // 将dB值转换为线性增益值
+                const linearGain = Math.pow(10, db / 20);
+                masterGainNode.gain.value = linearGain;
+            });
+        }
+
+        // 更新音频状态
+        function updateAudioStatus(active, text) {
+            const statusIndicator = document.getElementById('audio-status');
+            const statusText = document.getElementById('audio-status-text');
+            
+            if (active) {
+                statusIndicator.className = 'status-indicator status-active';
+            } else {
+                statusIndicator.className = 'status-indicator status-inactive';
+            }
+            
+            statusText.textContent = text;
+        }
+
+        // 生成通道HTML
+        function generateChannels() {
+            const channelsContainer = document.getElementById('channels-container');
+            channelsContainer.innerHTML = '';
+            
+            for (let i = 1; i <= 8; i++) {
+                const channelId = `ch${i}`;
+                const channelHTML = `
+                    <div class="channel" id="${channelId}">
+                        <div class="channel-header">
+                            <div class="channel-title">${currentMode === 'pro' ? 'CH' : '通道'} ${i}</div>
+                            <div class="channel-meter">
+                                <div class="channel-meter-level" id="meter-${channelId}"></div>
+                            </div>
+                        </div>
+                        <div class="input-source">
+                            <div class="drop-zone" data-channel="${channelId}">
+                                <div class="file-icon">📁</div>
+                                <p>${currentMode === 'pro' ? 'Drop File' : '拖放文件'}</p>
+                            </div>
+                            <button class="mic-btn" data-channel="${channelId}">${currentMode === 'pro' ? 'MIC' : '麦克风'}</button>
+                        </div>
+                        <div class="channel-controls">
+                            ${currentMode === 'pro' ? `
+                                <div class="control-group">
+                                    <div class="control-label">HPF</div>
+                                    <div class="fader">
+                                        <div class="fader-track">
+                                            <div class="fader-thumb" style="top: 80%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <div class="control-label">GATE</div>
+                                    <div class="fader">
+                                        <div class="fader-track">
+                                            <div class="fader-thumb" style="top: 70%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <div class="control-label">COMP</div>
+                                    <div class="fader">
+                                        <div class="fader-track">
+                                            <div class="fader-thumb" style="top: 60%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <div class="control-label">EQ LOW</div>
+                                    <div class="fader">
+                                        <div class="fader-track">
+                                            <div class="fader-thumb" style="top: 50%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <div class="control-label">EQ MID</div>
+                                    <div class="fader">
+                                        <div class="fader-track">
+                                            <div class="fader-thumb" style="top: 50%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <div class="control-label">EQ HIGH</div>
+                                    <div class="fader">
+                                        <div class="fader-track">
+                                            <div class="fader-thumb" style="top: 50%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <div class="control-label">PAN</div>
+                                    <div class="knob">
+                                        <div class="knob-dial">
+                                            <div class="knob-indicator" style="transform: translateX(-50%) rotate(0deg);"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <div class="control-label">FADER</div>
+                                    <div class="fader">
+                                        <div class="fader-track">
+                                            <div class="fader-thumb" style="top: 70%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : `
+                                <div class="control-group">
+                                    <div class="control-label">音量</div>
+                                    <div class="fader">
+                                        <div class="fader-track">
+                                            <div class="fader-thumb" style="top: 70%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <div class="control-label">声像</div>
+                                    <div class="knob">
+                                        <div class="knob-dial">
+                                            <div class="knob-indicator" style="transform: translateX(-50%) rotate(0deg);"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <div class="control-label">高通滤波</div>
+                                    <div class="fader">
+                                        <div class="fader-track">
+                                            <div class="fader-thumb" style="top: 80%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <div class="control-label">均衡器</div>
+                                    <div class="fader">
+                                        <div class="fader-track">
+                                            <div class="fader-thumb" style="top: 50%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `}
+                            <div class="button-group">
+                                <button class="channel-btn" data-channel="${channelId}" data-action="mute">
+                                    ${currentMode === 'pro' ? 'MUTE' : '静音'}
+                                </button>
+                                <button class="channel-btn" data-channel="${channelId}" data-action="solo">
+                                    ${currentMode === 'pro' ? 'SOLO' : '独奏'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                channelsContainer.innerHTML += channelHTML;
+            }
+            
+            // 添加通道按钮事件监听器
+            document.querySelectorAll('.channel-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const channel = e.target.getAttribute('data-channel');
+                    const action = e.target.getAttribute('data-action');
+                    
+                    handleChannelAction(channel, action, e.target);
+                });
+            });
+            
+            // 添加文件拖放功能
+            initDragAndDrop();
+            
+            // 添加麦克风按钮事件
+            initMicButtons();
+            
+            // 添加推子拖动功能
+            initFaders();
+        }
+
+        // 初始化文件拖放功能
+        function initDragAndDrop() {
+            const dropZones = document.querySelectorAll('.drop-zone');
+            
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    zone.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+                });
+                
+                zone.addEventListener('dragleave', () => {
+                    zone.style.backgroundColor = '';
+                });
+                
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.style.backgroundColor = '';
+                    
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        const channel = zone.getAttribute('data-channel');
+                        handleFileUpload(files[0], channel);
+                    }
+                });
+                
+                // 点击上传
+                zone.addEventListener('click', (e) => {
+                    if (e.target.tagName !== 'BUTTON') {
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = 'audio/*';
+                        input.onchange = (e) => {
+                            const files = e.target.files;
+                            if (files.length > 0) {
+                                const channel = zone.getAttribute('data-channel');
+                                handleFileUpload(files[0], channel);
+                            }
+                        };
+                        input.click();
+                    }
+                });
+            });
+        }
+
+        // 处理文件上传
+        function handleFileUpload(file, channel) {
+            if (!file.type.match('audio.*')) {
+                alert('请选择音频文件！');
+                return;
+            }
+            
+            // 更新UI显示文件已加载
+            const dropZone = document.querySelector(`.drop-zone[data-channel="${channel}"]`);
+            dropZone.innerHTML = `<div class="file-icon">✅</div><p>${file.name.substring(0, 10)}...</p>`;
+            
+            // 创建对象URL用于播放
+            const objectUrl = URL.createObjectURL(file);
+            
+            // 使用Audio元素解码
+            const audio = new Audio();
+            audio.src = objectUrl;
+            
+            // 使用OfflineAudioContext解码音频
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                audioContext.decodeAudioData(e.target.result, function(buffer) {
+                    channels[channel].audioBuffer = buffer;
+                    channels[channel].isMic = false;
+                    channels[channel].file = file;
+                    updateActiveChannels();
+                    console.log(`音频已加载到 ${channel}`);
+                }, function(e) {
+                    console.error("解码音频数据时出错", e);
+                });
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // 初始化麦克风按钮
+        function initMicButtons() {
+            document.querySelectorAll('.mic-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const channel = e.target.getAttribute('data-channel');
+                    if (channels[channel].isMic && channels[channel].isPlaying) {
+                        stopChannel(channel);
+                        e.target.classList.remove('active');
+                        const dropZone = document.querySelector(`.drop-zone[data-channel="${channel}"]`);
+                        dropZone.innerHTML = `<div class="file-icon">📁</div><p>${currentMode === 'pro' ? 'Drop File' : '拖放文件'}</p>`;
+                        channels[channel].isMic = false;
+                    } else {
+                        initMicrophone(channel);
+                        e.target.classList.add('active');
+                    }
+                    updateActiveChannels();
+                });
+            });
+        }
+
+        // 初始化麦克风输入
+        function initMicrophone(channel) {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    const source = audioContext.createMediaStreamSource(stream);
+                    const gainNode = audioContext.createGain();
+                    const panNode = audioContext.createStereoPanner();
+                    
+                    // 设置初始值
+                    gainNode.gain.value = 0.7;
+                    panNode.pan.value = 0;
+                    
+                    // 连接节点: 源 -> 通道EQ -> 通道滤波器 -> 声像 -> 增益 -> 分析器 -> 主控
+                    source.connect(channels[channel].eqLowNode);
+                    channels[channel].eqLowNode.connect(channels[channel].eqMidNode);
+                    channels[channel].eqMidNode.connect(channels[channel].eqHighNode);
+                    channels[channel].eqHighNode.connect(channels[channel].filterNode);
+                    channels[channel].filterNode.connect(panNode);
+                    panNode.connect(gainNode);
+                    gainNode.connect(channels[channel].analyser);
+                    channels[channel].analyser.connect(filterNode);
+                    
+                    channels[channel].source = source;
+                    channels[channel].gainNode = gainNode;
+                    channels[channel].panNode = panNode;
+                    channels[channel].isPlaying = true;
+                    channels[channel].isMic = true;
+                    
+                    // 更新UI
+                    const dropZone = document.querySelector(`.drop-zone[data-channel="${channel}"]`);
+                    dropZone.innerHTML = `<div class="file-icon">🎤</div><p>${currentMode === 'pro' ? 'MIC Active' : '麦克风使用中'}</p>`;
+                    
+                    updatePlaybackStatus();
+                    console.log(`麦克风连接到 ${channel}`);
+                })
+                .catch(error => {
+                    console.error('访问麦克风时出错:', error);
+                    alert('无法访问麦克风。请确保已授予麦克风权限。');
+                });
+            } else {
+                console.error('getUserMedia 不支持');
+                alert('您的浏览器不支持麦克风访问。');
+            }
+        }
+
+        // 处理通道按钮动作
+        function handleChannelAction(channel, action, button) {
+            switch(action) {
+                case 'mute':
+                    channels[channel].isMuted = !channels[channel].isMuted;
+                    button.classList.toggle('active', channels[channel].isMuted);
+                    if (channels[channel].gainNode) {
+                        channels[channel].gainNode.gain.value = channels[channel].isMuted ? 0 : 0.7;
+                    }
+                    break;
+                case 'solo':
+                    channels[channel].isSolo = !channels[channel].isSolo;
+                    button.classList.toggle('active', channels[channel].isSolo);
+                    // 实现独奏逻辑（简化版）
+                    Object.keys(channels).forEach(ch => {
+                        if (ch !== channel && channels[ch].gainNode) {
+                            channels[ch].gainNode.gain.value = channels[channel].isSolo ? 0 : 0.7;
+                        }
+                    });
+                    break;
+            }
+        }
+
+        // 初始化推子拖动功能
+        function initFaders() {
+            document.querySelectorAll('.fader').forEach(fader => {
+                const track = fader.querySelector('.fader-track');
+                const thumb = fader.querySelector('.fader-thumb');
+                
+                let isDragging = false;
+                
+                const updateThumbPosition = (y) => {
+                    const trackRect = track.getBoundingClientRect();
+                    let newTop = y - trackRect.top;
+                    
+                    // 限制在轨道范围内
+                    newTop = Math.max(0, Math.min(newTop, trackRect.height));
+                    
+                    // 更新拇指位置
+                    thumb.style.top = `${newTop}px`;
+                    
+                    // 计算值（0-1）
+                    const value = 1 - (newTop / trackRect.height);
+                    
+                    // 这里可以添加实际控制音频节点的代码
+                    console.log(`Fader value: ${value.toFixed(2)}`);
+                };
+                
+                thumb.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    e.preventDefault();
+                });
+                
+                document.addEventListener('mousemove', (e) => {
+                    if (isDragging) {
+                        updateThumbPosition(e.clientY);
+                    }
+                });
+                
+                document.addEventListener('mouseup', () => {
+                    isDragging = false;
+                });
+                
+                track.addEventListener('click', (e) => {
+                    updateThumbPosition(e.clientY);
+                });
+            });
+        }
+
+        // 更新活动通道计数
+        function updateActiveChannels() {
+            let activeCount = 0;
+            for (let i = 1; i <= 8; i++) {
+                const channelId = `ch${i}`;
+                if (channels[channelId].audioBuffer || channels[channelId].isMic) {
+                    activeCount++;
+                }
+            }
+            document.getElementById('active-channels').textContent = activeCount;
+        }
+
+        // 更新电平表
+        function updateMeters() {
+            for (let i = 1; i <= 8; i++) {
+                const channelId = `ch${i}`;
+                const meter = document.getElementById(`meter-${channelId}`);
+                
+                // 模拟电平表动画
+                if (channels[channelId].isPlaying) {
+                    const randomLevel = Math.random() * 80 + 10; // 10-90%
+                    meter.style.height = `${randomLevel}%`;
+                } else {
+                    meter.style.height = '0%';
+                }
+            }
+            
+            requestAnimationFrame(updateMeters);
+        }
+
+        // 播放/停止音频
+        function playAllChannels() {
+            if (isPlaying) return;
+            
+            Object.keys(channels).forEach(channel => {
+                if (!channels[channel].isPlaying && channels[channel].audioBuffer) {
+                    // 创建音频源
+                    const source = audioContext.createBufferSource();
+                    source.buffer = channels[channel].audioBuffer;
+                    source.loop = true;
+                    
+                    // 创建增益节点
+                    const gainNode = audioContext.createGain();
+                    gainNode.gain.value = channels[channel].isMuted ? 0 : 0.7;
+                    
+                    // 创建声像节点
+                    const panNode = audioContext.createStereoPanner();
+                    panNode.pan.value = 0;
+                    
+                    // 连接节点: 源 -> 通道EQ -> 通道滤波器 -> 声像 -> 增益 -> 分析器 -> 主控
+                    source.connect(channels[channel].eqLowNode);
+                    channels[channel].eqLowNode.connect(channels[channel].eqMidNode);
+                    channels[channel].eqMidNode.connect(channels[channel].eqHighNode);
+                    channels[channel].eqHighNode.connect(channels[channel].filterNode);
+                    channels[channel].filterNode.connect(panNode);
+                    panNode.connect(gainNode);
+                    gainNode.connect(channels[channel].analyser);
+                    channels[channel].analyser.connect(filterNode);
+                    
+                    // 保存引用
+                    channels[channel].source = source;
+                    channels[channel].gainNode = gainNode;
+                    channels[channel].panNode = panNode;
+                    channels[channel].isPlaying = true;
+                    
+                    // 开始播放
+                    source.start();
+                }
+            });
+            
+            isPlaying = true;
+            updatePlaybackStatus();
+        }
+
+        function stopAllChannels() {
+            Object.keys(channels).forEach(channel => {
+                if (channels[channel].isPlaying && channels[channel].source && !channels[channel].isMic) {
+                    channels[channel].source.stop();
+                    channels[channel].isPlaying = false;
+                }
+            });
+            
+            isPlaying = false;
+            updatePlaybackStatus();
+        }
+
+        function stopChannel(channel) {
+            if (channels[channel].isMic) {
+                // 对于麦克风，我们只是断开连接，不停止流
+                if (channels[channel].source) {
+                    channels[channel].source.disconnect();
+                    channels[channel].source = null;
+                    channels[channel].isPlaying = false;
+                }
+            } else if (channels[channel].source && channels[channel].isPlaying) {
+                channels[channel].source.stop();
+                channels[channel].isPlaying = false;
+            }
+            
+            updatePlaybackStatus();
+        }
+
+        // 更新播放状态
+        function updatePlaybackStatus() {
+            const statusIndicator = document.getElementById('playback-status');
+            const statusText = document.getElementById('playback-status-text');
+            
+            let anyPlaying = false;
+            for (let i = 1; i <= 8; i++) {
+                const channelId = `ch${i}`;
+                if (channels[channelId].isPlaying) {
+                    anyPlaying = true;
+                    break;
+                }
+            }
+            
+            if (anyPlaying) {
+                statusIndicator.className = 'status-indicator status-active';
+                statusText.textContent = '播放状态: 播放中';
+                isPlaying = true;
+            } else {
+                statusIndicator.className = 'status-indicator status-inactive';
+                statusText.textContent = '播放状态: 停止';
+                isPlaying = false;
+            }
+            
+            // 更新活动通道计数
+            let activeCount = 0;
+            Object.keys(channels).forEach(channel => {
+                if (channels[channel].isPlaying) activeCount++;
+            });
+            document.getElementById('active-channels').textContent = activeCount;
+        }
+
+        // 删除录音相关的初始化代码
+        function initRecording() {
+            // 不再需要录音初始化
+        }
+
+        // 删除录音相关的函数
+        function startRecording() {
+            // 不再需要录音功能
+        }
+
+        function stopRecording() {
+            // 不再需要录音功能
+        }
+
+        function playRecorded() {
+            // 不再需要录音功能
+        }
+
+        // 模式切换
+        function initModeSwitcher() {
+            const beginnerBtn = document.getElementById('beginner-mode-btn');
+            const proBtn = document.getElementById('pro-mode-btn');
+            const mixerContainer = document.getElementById('mixer-container');
+            
+            beginnerBtn.addEventListener('click', () => {
+                if (currentMode === 'pro') {
+                    currentMode = 'beginner';
+                    mixerContainer.className = 'mixer-container beginner-mode';
+                    beginnerBtn.classList.add('active');
+                    proBtn.classList.remove('active');
+                    generateChannels();
+                }
+            });
+            
+            proBtn.addEventListener('click', () => {
+                if (currentMode === 'beginner') {
+                    currentMode = 'pro';
+                    mixerContainer.className = 'mixer-container pro-mode';
+                    proBtn.classList.add('active');
+                    beginnerBtn.classList.remove('active');
+                    generateChannels();
+                }
+            });
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            initAudio();
+            generateChannels();
+            initModeSwitcher();
+            initRecording();
+            updateMeters();
+            
+            // 播放/停止按钮事件
+            document.getElementById('play-btn').addEventListener('click', playAllChannels);
+            document.getElementById('stop-btn').addEventListener('click', stopAllChannels);
+        });
+    </script>
+</body>
+</html>
