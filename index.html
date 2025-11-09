@@ -36,6 +36,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         h1 {
@@ -44,6 +46,12 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
         }
 
         .mode-selector {
@@ -74,6 +82,29 @@
 
         .mode-btn:not(.active):hover {
             background: rgba(255, 255, 255, 0.2);
+        }
+
+        .language-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        .language-selector select {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .language-selector select option {
+            background: #1a1a2e;
+            color: white;
         }
 
         .mixer-container {
@@ -579,6 +610,11 @@
                 gap: 15px;
             }
             
+            .header-controls {
+                width: 100%;
+                justify-content: center;
+            }
+            
             .mode-selector {
                 width: 100%;
                 justify-content: center;
@@ -589,10 +625,19 @@
 <body>
     <div class="container">
         <header>
-            <h1>专业音频调音台模拟器</h1>
-            <div class="mode-selector">
-                <button class="mode-btn active" id="beginner-mode-btn">新手模式</button>
-                <button class="mode-btn" id="pro-mode-btn">专业模式</button>
+            <h1 id="app-title">专业音频调音台模拟器</h1>
+            <div class="header-controls">
+                <div class="mode-selector">
+                    <button class="mode-btn active" id="beginner-mode-btn">新手模式</button>
+                    <button class="mode-btn" id="pro-mode-btn">专业模式</button>
+                </div>
+                <div class="language-selector">
+                    <i class="fas fa-globe"></i>
+                    <select id="language-select">
+                        <option value="zh-CN">中文</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
             </div>
         </header>
 
@@ -604,10 +649,10 @@
             </div>
             
             <div class="master-section">
-                <h2 class="master-title">主控</h2>
+                <h2 class="master-title" id="master-title">主控</h2>
                 <div class="master-controls">
                     <div class="control-group">
-                        <div class="control-label">主音量</div>
+                        <div class="control-label" id="master-volume-label">主音量</div>
                         <div class="master-fader">
                             <div class="master-fader-track">
                                 <div class="master-fader-thumb" id="master-fader-thumb" style="top: 30%;"></div>
@@ -616,20 +661,20 @@
                     </div>
                     
                     <div class="filter-section">
-                        <h3 class="filter-title">滤波器</h3>
+                        <h3 class="filter-title" id="filter-title">滤波器</h3>
                         <div class="filter-controls">
                             <div class="filter-slider">
-                                <label for="filter-freq">频率:</label>
+                                <label for="filter-freq" id="filter-freq-label">频率:</label>
                                 <input type="range" min="20" max="20000" value="1000" id="filter-freq">
                                 <span id="filter-freq-value">1000 Hz</span>
                             </div>
                             <div class="filter-slider">
-                                <label for="filter-q">Q值:</label>
+                                <label for="filter-q" id="filter-q-label">Q值:</label>
                                 <input type="range" min="0.1" max="10" value="1" step="0.1" id="filter-q">
                                 <span id="filter-q-value">1.0</span>
                             </div>
                             <div class="filter-slider">
-                                <label for="filter-type">类型:</label>
+                                <label for="filter-type" id="filter-type-label">类型:</label>
                                 <select id="filter-type">
                                     <option value="lowpass">低通</option>
                                     <option value="highpass">高通</option>
@@ -642,10 +687,10 @@
                     </div>
                     
                     <div class="eq-section">
-                        <h3 class="eq-title">均衡器</h3>
+                        <h3 class="eq-title" id="eq-title">均衡器</h3>
                         <div class="eq-bands">
                             <div class="eq-band">
-                                <div class="control-label">低频</div>
+                                <div class="control-label" id="eq-low-label">低频</div>
                                 <div class="fader">
                                     <div class="fader-track">
                                         <div class="fader-thumb" id="eq-low-thumb" style="top: 50%;"></div>
@@ -654,7 +699,7 @@
                                 <span id="eq-low-value">0 dB</span>
                             </div>
                             <div class="eq-band">
-                                <div class="control-label">中频</div>
+                                <div class="control-label" id="eq-mid-label">中频</div>
                                 <div class="fader">
                                     <div class="fader-track">
                                         <div class="fader-thumb" id="eq-mid-thumb" style="top: 50%;"></div>
@@ -663,7 +708,7 @@
                                 <span id="eq-mid-value">0 dB</span>
                             </div>
                             <div class="eq-band">
-                                <div class="control-label">高频</div>
+                                <div class="control-label" id="eq-high-label">高频</div>
                                 <div class="fader">
                                     <div class="fader-track">
                                         <div class="fader-thumb" id="eq-high-thumb" style="top: 50%;"></div>
@@ -675,10 +720,10 @@
                     </div>
                     
                     <div class="gain-section">
-                        <h3 class="gain-title">增益</h3>
+                        <h3 class="gain-title" id="gain-title">增益</h3>
                         <div class="gain-controls">
                             <div class="gain-slider">
-                                <label for="master-gain">增益:</label>
+                                <label for="master-gain" id="master-gain-label">增益:</label>
                                 <input type="range" min="-20" max="20" value="0" id="master-gain">
                                 <span id="master-gain-value">0 dB</span>
                             </div>
@@ -687,10 +732,10 @@
                     
                     <div class="transport-controls">
                         <button class="transport-btn play-btn" id="play-btn">
-                            <i class="fas fa-play"></i> 播放全部
+                            <i class="fas fa-play"></i> <span id="play-btn-text">播放全部</span>
                         </button>
                         <button class="transport-btn stop-btn" id="stop-btn">
-                            <i class="fas fa-stop"></i> 停止全部
+                            <i class="fas fa-stop"></i> <span id="stop-btn-text">停止全部</span>
                         </button>
                     </div>
                 </div>
@@ -707,19 +752,137 @@
                 <span id="playback-status-text">播放状态: 停止</span>
             </div>
             <div class="status-item">
-                <span>活动通道: <span id="active-channels">0</span>/8</span>
+                <span id="active-channels-label">活动通道: <span id="active-channels">0</span>/8</span>
             </div>
             <div class="status-item">
-                <span>采样率: 48kHz | 位深度: 24-bit</span>
+                <span id="sample-rate-label">采样率: 48kHz | 位深度: 24-bit</span>
             </div>
         </div>
 
         <footer>
-            <p>专业音频调音台模拟器 &copy; 2023 | 支持多通道混音、均衡器、滤波器和录音功能</p>
+            <p id="footer-text">专业音频调音台模拟器 &copy; 2023 | 支持多通道混音、均衡器、滤波器和录音功能</p>
         </footer>
     </div>
 
     <script>
+        // 语言资源
+        const translations = {
+            'zh-CN': {
+                'app-title': '专业音频调音台模拟器',
+                'beginner-mode': '新手模式',
+                'pro-mode': '专业模式',
+                'master-title': '主控',
+                'master-volume-label': '主音量',
+                'filter-title': '滤波器',
+                'filter-freq-label': '频率:',
+                'filter-q-label': 'Q值:',
+                'filter-type-label': '类型:',
+                'filter-types': {
+                    'lowpass': '低通',
+                    'highpass': '高通',
+                    'bandpass': '带通',
+                    'lowshelf': '低架',
+                    'highshelf': '高架'
+                },
+                'eq-title': '均衡器',
+                'eq-low-label': '低频',
+                'eq-mid-label': '中频',
+                'eq-high-label': '高频',
+                'gain-title': '增益',
+                'master-gain-label': '增益:',
+                'play-btn-text': '播放全部',
+                'stop-btn-text': '停止全部',
+                'audio-status-text': '音频系统: 就绪',
+                'playback-status-text': '播放状态: 停止',
+                'active-channels-label': '活动通道:',
+                'sample-rate-label': '采样率: 48kHz | 位深度: 24-bit',
+                'footer-text': '专业音频调音台模拟器 &copy; 2023 | 支持多通道混音、均衡器、滤波器和录音功能',
+                'channel-prefix': '通道',
+                'drop-file-text': '拖放文件',
+                'mic-btn-text': '麦克风',
+                'mic-active-text': '麦克风使用中',
+                'mute-btn-text': '静音',
+                'solo-btn-text': '独奏',
+                'volume-label': '音量',
+                'pan-label': '声像',
+                'hpf-label': '高通滤波',
+                'eq-label': '均衡器',
+                'pro-channel-prefix': 'CH',
+                'pro-drop-file-text': 'Drop File',
+                'pro-mic-btn-text': 'MIC',
+                'pro-mic-active-text': 'MIC Active',
+                'pro-mute-btn-text': 'MUTE',
+                'pro-solo-btn-text': 'SOLO',
+                'pro-control-labels': {
+                    'HPF': 'HPF',
+                    'GATE': 'GATE',
+                    'COMP': 'COMP',
+                    'EQ_LOW': 'EQ LOW',
+                    'EQ_MID': 'EQ MID',
+                    'EQ_HIGH': 'EQ HIGH',
+                    'PAN': 'PAN',
+                    'FADER': 'FADER'
+                }
+            },
+            'en': {
+                'app-title': 'Professional Audio Mixer Simulator',
+                'beginner-mode': 'Beginner Mode',
+                'pro-mode': 'Pro Mode',
+                'master-title': 'Master',
+                'master-volume-label': 'Master Volume',
+                'filter-title': 'Filter',
+                'filter-freq-label': 'Freq:',
+                'filter-q-label': 'Q:',
+                'filter-type-label': 'Type:',
+                'filter-types': {
+                    'lowpass': 'Lowpass',
+                    'highpass': 'Highpass',
+                    'bandpass': 'Bandpass',
+                    'lowshelf': 'Lowshelf',
+                    'highshelf': 'Highshelf'
+                },
+                'eq-title': 'Equalizer',
+                'eq-low-label': 'Low',
+                'eq-mid-label': 'Mid',
+                'eq-high-label': 'High',
+                'gain-title': 'Gain',
+                'master-gain-label': 'Gain:',
+                'play-btn-text': 'Play All',
+                'stop-btn-text': 'Stop All',
+                'audio-status-text': 'Audio System: Ready',
+                'playback-status-text': 'Playback: Stopped',
+                'active-channels-label': 'Active Channels:',
+                'sample-rate-label': 'Sample Rate: 48kHz | Bit Depth: 24-bit',
+                'footer-text': 'Professional Audio Mixer Simulator &copy; 2023 | Supports multi-channel mixing, EQ, filters and recording',
+                'channel-prefix': 'Channel',
+                'drop-file-text': 'Drop File',
+                'mic-btn-text': 'Microphone',
+                'mic-active-text': 'Mic Active',
+                'mute-btn-text': 'Mute',
+                'solo-btn-text': 'Solo',
+                'volume-label': 'Volume',
+                'pan-label': 'Pan',
+                'hpf-label': 'HPF',
+                'eq-label': 'EQ',
+                'pro-channel-prefix': 'CH',
+                'pro-drop-file-text': 'Drop File',
+                'pro-mic-btn-text': 'MIC',
+                'pro-mic-active-text': 'MIC Active',
+                'pro-mute-btn-text': 'MUTE',
+                'pro-solo-btn-text': 'SOLO',
+                'pro-control-labels': {
+                    'HPF': 'HPF',
+                    'GATE': 'GATE',
+                    'COMP': 'COMP',
+                    'EQ_LOW': 'EQ LOW',
+                    'EQ_MID': 'EQ MID',
+                    'EQ_HIGH': 'EQ HIGH',
+                    'PAN': 'PAN',
+                    'FADER': 'FADER'
+                }
+            }
+        };
+
         // 全局变量
         let audioContext;
         let masterGainNode;
@@ -728,6 +891,7 @@
         let isPlaying = false;
         let channels = {};
         let currentMode = 'beginner';
+        let currentLanguage = 'zh-CN';
         
         // 删除录音相关的全局变量
         let mediaRecorder;
@@ -824,7 +988,7 @@
                     channels[channelId].filterNode.Q.value = 1;
                 }
                 
-                updateAudioStatus(true, "音频系统: 就绪");
+                updateAudioStatus(true, translations[currentLanguage]['audio-status-text']);
                 console.log("音频系统初始化成功");
                 
                 // 初始化主控推子
@@ -840,7 +1004,7 @@
                 initGainControls();
             } catch (error) {
                 console.error("音频系统初始化失败:", error);
-                updateAudioStatus(false, "音频系统: 错误");
+                updateAudioStatus(false, translations[currentLanguage]['audio-status-text']);
             }
         }
 
@@ -908,6 +1072,17 @@
             
             filterType.addEventListener('change', (e) => {
                 filterNode.type = e.target.value;
+                updateFilterTypeOptions();
+            });
+        }
+
+        // 更新滤波器类型选项
+        function updateFilterTypeOptions() {
+            const filterType = document.getElementById('filter-type');
+            const options = filterType.querySelectorAll('option');
+            
+            options.forEach(option => {
+                option.textContent = translations[currentLanguage]['filter-types'][option.value];
             });
         }
 
@@ -1016,7 +1191,7 @@
                 const channelHTML = `
                     <div class="channel" id="${channelId}">
                         <div class="channel-header">
-                            <div class="channel-title">${currentMode === 'pro' ? 'CH' : '通道'} ${i}</div>
+                            <div class="channel-title">${currentMode === 'pro' ? translations[currentLanguage]['pro-channel-prefix'] : translations[currentLanguage]['channel-prefix']} ${i}</div>
                             <div class="channel-meter">
                                 <div class="channel-meter-level" id="meter-${channelId}"></div>
                             </div>
@@ -1024,14 +1199,14 @@
                         <div class="input-source">
                             <div class="drop-zone" data-channel="${channelId}">
                                 <div class="file-icon">📁</div>
-                                <p>${currentMode === 'pro' ? 'Drop File' : '拖放文件'}</p>
+                                <p>${currentMode === 'pro' ? translations[currentLanguage]['pro-drop-file-text'] : translations[currentLanguage]['drop-file-text']}</p>
                             </div>
-                            <button class="mic-btn" data-channel="${channelId}">${currentMode === 'pro' ? 'MIC' : '麦克风'}</button>
+                            <button class="mic-btn" data-channel="${channelId}">${currentMode === 'pro' ? translations[currentLanguage]['pro-mic-btn-text'] : translations[currentLanguage]['mic-btn-text']}</button>
                         </div>
                         <div class="channel-controls">
                             ${currentMode === 'pro' ? `
                                 <div class="control-group">
-                                    <div class="control-label">HPF</div>
+                                    <div class="control-label">${translations[currentLanguage]['pro-control-labels']['HPF']}</div>
                                     <div class="fader">
                                         <div class="fader-track">
                                             <div class="fader-thumb" style="top: 80%;"></div>
@@ -1039,7 +1214,7 @@
                                     </div>
                                 </div>
                                 <div class="control-group">
-                                    <div class="control-label">GATE</div>
+                                    <div class="control-label">${translations[currentLanguage]['pro-control-labels']['GATE']}</div>
                                     <div class="fader">
                                         <div class="fader-track">
                                             <div class="fader-thumb" style="top: 70%;"></div>
@@ -1047,7 +1222,7 @@
                                     </div>
                                 </div>
                                 <div class="control-group">
-                                    <div class="control-label">COMP</div>
+                                    <div class="control-label">${translations[currentLanguage]['pro-control-labels']['COMP']}</div>
                                     <div class="fader">
                                         <div class="fader-track">
                                             <div class="fader-thumb" style="top: 60%;"></div>
@@ -1055,7 +1230,7 @@
                                     </div>
                                 </div>
                                 <div class="control-group">
-                                    <div class="control-label">EQ LOW</div>
+                                    <div class="control-label">${translations[currentLanguage]['pro-control-labels']['EQ_LOW']}</div>
                                     <div class="fader">
                                         <div class="fader-track">
                                             <div class="fader-thumb" style="top: 50%;"></div>
@@ -1063,7 +1238,7 @@
                                     </div>
                                 </div>
                                 <div class="control-group">
-                                    <div class="control-label">EQ MID</div>
+                                    <div class="control-label">${translations[currentLanguage]['pro-control-labels']['EQ_MID']}</div>
                                     <div class="fader">
                                         <div class="fader-track">
                                             <div class="fader-thumb" style="top: 50%;"></div>
@@ -1071,7 +1246,7 @@
                                     </div>
                                 </div>
                                 <div class="control-group">
-                                    <div class="control-label">EQ HIGH</div>
+                                    <div class="control-label">${translations[currentLanguage]['pro-control-labels']['EQ_HIGH']}</div>
                                     <div class="fader">
                                         <div class="fader-track">
                                             <div class="fader-thumb" style="top: 50%;"></div>
@@ -1079,7 +1254,7 @@
                                     </div>
                                 </div>
                                 <div class="control-group">
-                                    <div class="control-label">PAN</div>
+                                    <div class="control-label">${translations[currentLanguage]['pro-control-labels']['PAN']}</div>
                                     <div class="knob">
                                         <div class="knob-dial">
                                             <div class="knob-indicator" style="transform: translateX(-50%) rotate(0deg);"></div>
@@ -1087,7 +1262,7 @@
                                     </div>
                                 </div>
                                 <div class="control-group">
-                                    <div class="control-label">FADER</div>
+                                    <div class="control-label">${translations[currentLanguage]['pro-control-labels']['FADER']}</div>
                                     <div class="fader">
                                         <div class="fader-track">
                                             <div class="fader-thumb" style="top: 70%;"></div>
@@ -1096,7 +1271,7 @@
                                 </div>
                             ` : `
                                 <div class="control-group">
-                                    <div class="control-label">音量</div>
+                                    <div class="control-label">${translations[currentLanguage]['volume-label']}</div>
                                     <div class="fader">
                                         <div class="fader-track">
                                             <div class="fader-thumb" style="top: 70%;"></div>
@@ -1104,7 +1279,7 @@
                                     </div>
                                 </div>
                                 <div class="control-group">
-                                    <div class="control-label">声像</div>
+                                    <div class="control-label">${translations[currentLanguage]['pan-label']}</div>
                                     <div class="knob">
                                         <div class="knob-dial">
                                             <div class="knob-indicator" style="transform: translateX(-50%) rotate(0deg);"></div>
@@ -1112,7 +1287,7 @@
                                     </div>
                                 </div>
                                 <div class="control-group">
-                                    <div class="control-label">高通滤波</div>
+                                    <div class="control-label">${translations[currentLanguage]['hpf-label']}</div>
                                     <div class="fader">
                                         <div class="fader-track">
                                             <div class="fader-thumb" style="top: 80%;"></div>
@@ -1120,7 +1295,7 @@
                                     </div>
                                 </div>
                                 <div class="control-group">
-                                    <div class="control-label">均衡器</div>
+                                    <div class="control-label">${translations[currentLanguage]['eq-label']}</div>
                                     <div class="fader">
                                         <div class="fader-track">
                                             <div class="fader-thumb" style="top: 50%;"></div>
@@ -1130,10 +1305,10 @@
                             `}
                             <div class="button-group">
                                 <button class="channel-btn" data-channel="${channelId}" data-action="mute">
-                                    ${currentMode === 'pro' ? 'MUTE' : '静音'}
+                                    ${currentMode === 'pro' ? translations[currentLanguage]['pro-mute-btn-text'] : translations[currentLanguage]['mute-btn-text']}
                                 </button>
                                 <button class="channel-btn" data-channel="${channelId}" data-action="solo">
-                                    ${currentMode === 'pro' ? 'SOLO' : '独奏'}
+                                    ${currentMode === 'pro' ? translations[currentLanguage]['pro-solo-btn-text'] : translations[currentLanguage]['solo-btn-text']}
                                 </button>
                             </div>
                         </div>
@@ -1249,7 +1424,7 @@
                         stopChannel(channel);
                         e.target.classList.remove('active');
                         const dropZone = document.querySelector(`.drop-zone[data-channel="${channel}"]`);
-                        dropZone.innerHTML = `<div class="file-icon">📁</div><p>${currentMode === 'pro' ? 'Drop File' : '拖放文件'}</p>`;
+                        dropZone.innerHTML = `<div class="file-icon">📁</div><p>${currentMode === 'pro' ? translations[currentLanguage]['pro-drop-file-text'] : translations[currentLanguage]['drop-file-text']}</p>`;
                         channels[channel].isMic = false;
                     } else {
                         initMicrophone(channel);
@@ -1291,7 +1466,7 @@
                     
                     // 更新UI
                     const dropZone = document.querySelector(`.drop-zone[data-channel="${channel}"]`);
-                    dropZone.innerHTML = `<div class="file-icon">🎤</div><p>${currentMode === 'pro' ? 'MIC Active' : '麦克风使用中'}</p>`;
+                    dropZone.innerHTML = `<div class="file-icon">🎤</div><p>${currentMode === 'pro' ? translations[currentLanguage]['pro-mic-active-text'] : translations[currentLanguage]['mic-active-text']}</p>`;
                     
                     updatePlaybackStatus();
                     console.log(`麦克风连接到 ${channel}`);
@@ -1493,11 +1668,11 @@
             
             if (anyPlaying) {
                 statusIndicator.className = 'status-indicator status-active';
-                statusText.textContent = '播放状态: 播放中';
+                statusText.textContent = translations[currentLanguage]['playback-status-text'];
                 isPlaying = true;
             } else {
                 statusIndicator.className = 'status-indicator status-inactive';
-                statusText.textContent = '播放状态: 停止';
+                statusText.textContent = translations[currentLanguage]['playback-status-text'];
                 isPlaying = false;
             }
             
@@ -1539,6 +1714,7 @@
                     mixerContainer.className = 'mixer-container beginner-mode';
                     beginnerBtn.classList.add('active');
                     proBtn.classList.remove('active');
+                    updateUIForCurrentMode();
                     generateChannels();
                 }
             });
@@ -1549,9 +1725,66 @@
                     mixerContainer.className = 'mixer-container pro-mode';
                     proBtn.classList.add('active');
                     beginnerBtn.classList.remove('active');
+                    updateUIForCurrentMode();
                     generateChannels();
                 }
             });
+        }
+
+        // 更新UI模式文本
+        function updateUIForCurrentMode() {
+            document.getElementById('beginner-mode-btn').textContent = translations[currentLanguage]['beginner-mode'];
+            document.getElementById('pro-mode-btn').textContent = translations[currentLanguage]['pro-mode'];
+        }
+
+        // 初始化语言选择器
+        function initLanguageSelector() {
+            const languageSelect = document.getElementById('language-select');
+            
+            // 设置默认语言
+            languageSelect.value = currentLanguage;
+            
+            languageSelect.addEventListener('change', (e) => {
+                currentLanguage = e.target.value;
+                updatePageLanguage();
+            });
+        }
+
+        // 更新页面语言
+        function updatePageLanguage() {
+            // 更新静态文本
+            document.getElementById('app-title').textContent = translations[currentLanguage]['app-title'];
+            document.getElementById('master-title').textContent = translations[currentLanguage]['master-title'];
+            document.getElementById('master-volume-label').textContent = translations[currentLanguage]['master-volume-label'];
+            document.getElementById('filter-title').textContent = translations[currentLanguage]['filter-title'];
+            document.getElementById('filter-freq-label').textContent = translations[currentLanguage]['filter-freq-label'];
+            document.getElementById('filter-q-label').textContent = translations[currentLanguage]['filter-q-label'];
+            document.getElementById('filter-type-label').textContent = translations[currentLanguage]['filter-type-label'];
+            document.getElementById('eq-title').textContent = translations[currentLanguage]['eq-title'];
+            document.getElementById('eq-low-label').textContent = translations[currentLanguage]['eq-low-label'];
+            document.getElementById('eq-mid-label').textContent = translations[currentLanguage]['eq-mid-label'];
+            document.getElementById('eq-high-label').textContent = translations[currentLanguage]['eq-high-label'];
+            document.getElementById('gain-title').textContent = translations[currentLanguage]['gain-title'];
+            document.getElementById('master-gain-label').textContent = translations[currentLanguage]['master-gain-label'];
+            document.getElementById('play-btn-text').textContent = translations[currentLanguage]['play-btn-text'];
+            document.getElementById('stop-btn-text').textContent = translations[currentLanguage]['stop-btn-text'];
+            document.getElementById('audio-status-text').textContent = translations[currentLanguage]['audio-status-text'];
+            document.getElementById('playback-status-text').textContent = translations[currentLanguage]['playback-status-text'];
+            document.getElementById('active-channels-label').textContent = translations[currentLanguage]['active-channels-label'];
+            document.getElementById('sample-rate-label').textContent = translations[currentLanguage]['sample-rate-label'];
+            document.getElementById('footer-text').textContent = translations[currentLanguage]['footer-text'];
+            
+            // 更新模式按钮文本
+            updateUIForCurrentMode();
+            
+            // 更新滤波器选项
+            updateFilterTypeOptions();
+            
+            // 重新生成通道
+            generateChannels();
+            
+            // 更新播放状态
+            updatePlaybackStatus();
         }
 
         // 页面加载完成后初始化
@@ -1559,6 +1792,7 @@
             initAudio();
             generateChannels();
             initModeSwitcher();
+            initLanguageSelector();
             initRecording();
             updateMeters();
             
