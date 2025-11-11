@@ -749,18 +749,18 @@
             </div>
             <div class="status-item">
                 <div class="status-indicator status-inactive" id="playback-status"></div>
-                <span id="playback-status-text">播放状态: 停止</span>
+                <span id="playback-status-text">播放状态</span>
             </div>
             <div class="status-item">
                 <span id="active-channels-label">活动通道: <span id="active-channels">0</span>/8</span>
             </div>
             <div class="status-item">
-                <span id="sample-rate-label">采样率: 48kHz | 位深度: 24-bit</span>
+                <span id="sample-rate-label"></span>
             </div>
         </div>
 
         <footer>
-            <p id="footer-text">专业音频调音台模拟器 &copy; 2023 | 支持多通道混音、均衡器、滤波器和录音功能</p>
+            <p id="footer-text">专业音频调音台模拟器 &copy; 2025 | 支持多通道混音、均衡器、滤波器和录音功能</p>
         </footer>
     </div>
 
@@ -793,10 +793,10 @@
                 'play-btn-text': '播放全部',
                 'stop-btn-text': '停止全部',
                 'audio-status-text': '音频系统: 就绪',
-                'playback-status-text': '播放状态: 停止',
+                'playback-status-text': '播放状态',
                 'active-channels-label': '活动通道:',
-                'sample-rate-label': '采样率: 48kHz | 位深度: 24-bit',
-                'footer-text': '专业音频调音台模拟器 &copy; 2023 | 支持多通道混音、均衡器、滤波器和录音功能',
+                'sample-rate-label': '',
+                'footer-text': '专业音频调音台模拟器 &copy; 2025 | 支持多通道混音、均衡器、滤波器和录音功能',
                 'channel-prefix': '通道',
                 'drop-file-text': '拖放文件',
                 'mic-btn-text': '麦克风',
@@ -850,10 +850,10 @@
                 'play-btn-text': 'Play All',
                 'stop-btn-text': 'Stop All',
                 'audio-status-text': 'Audio System: Ready',
-                'playback-status-text': 'Playback: Stopped',
+                'playback-status-text': 'Playback',
                 'active-channels-label': 'Active Channels:',
-                'sample-rate-label': 'Sample Rate: 48kHz | Bit Depth: 24-bit',
-                'footer-text': 'Professional Audio Mixer Simulator &copy; 2023 | Supports multi-channel mixing, EQ, filters and recording',
+                //'sample-rate-label': 
+                'footer-text': 'Professional Audio Mixer Simulator &copy; 2025 | Supports multi-channel mixing, EQ, filters and recording',
                 'channel-prefix': 'Channel',
                 'drop-file-text': 'Drop File',
                 'mic-btn-text': 'Microphone',
@@ -893,14 +893,6 @@
         let currentMode = 'beginner';
         let currentLanguage = 'zh-CN';
         
-        // 删除录音相关的全局变量
-        let mediaRecorder;
-        let recordedChunks = [];
-        let isRecording = false;
-        let recordingStartTime;
-        let recordingTimer;
-        let recordedClips = [];
-
         // 初始化音频上下文
         function initAudio() {
             try {
@@ -1335,6 +1327,9 @@
             
             // 添加推子拖动功能
             initFaders();
+            
+            // 添加旋钮控制功能
+            initKnobs();
         }
 
         // 初始化文件拖放功能
@@ -1509,6 +1504,11 @@
             document.querySelectorAll('.fader').forEach(fader => {
                 const track = fader.querySelector('.fader-track');
                 const thumb = fader.querySelector('.fader-thumb');
+                const channelElement = fader.closest('.channel');
+                
+                if (!channelElement) return; // 跳过主控部分的推子
+                
+                const channelId = channelElement.id;
                 
                 let isDragging = false;
                 
@@ -1525,8 +1525,10 @@
                     // 计算值（0-1）
                     const value = 1 - (newTop / trackRect.height);
                     
-                    // 这里可以添加实际控制音频节点的代码
-                    console.log(`Fader value: ${value.toFixed(2)}`);
+                    // 更新对应通道的音量
+                    if (channels[channelId].gainNode) {
+                        channels[channelId].gainNode.gain.value = value;
+                    }
                 };
                 
                 thumb.addEventListener('mousedown', (e) => {
@@ -1546,6 +1548,71 @@
                 
                 track.addEventListener('click', (e) => {
                     updateThumbPosition(e.clientY);
+                });
+            });
+        }
+
+        // 初始化旋钮控制
+        function initKnobs() {
+            document.querySelectorAll('.knob').forEach(knob => {
+                const dial = knob.querySelector('.knob-dial');
+                const indicator = knob.querySelector('.knob-indicator');
+                const channelElement = knob.closest('.channel');
+                
+                if (!channelElement) return; // 跳过主控部分的旋钮
+                
+                const channelId = channelElement.id;
+                
+                let isDragging = false;
+                let currentRotation = 0; // -150 到 150 度
+                
+                const updateRotation = (clientX, clientY) => {
+                    const knobRect = dial.getBoundingClientRect();
+                    const centerX = knobRect.left + knobRect.width / 2;
+                    const centerY = knobRect.top + knobRect.height / 2;
+                    
+                    const deltaX = clientX - centerX;
+                    const deltaY = clientY - centerY;
+                    
+                    // 计算角度
+                    let angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
+                    
+                    // 限制在 -150 到 150 度范围内
+                    if (angle < -150) angle = -150;
+                    if (angle > 150) angle = 150;
+                    
+                    currentRotation = angle;
+                    
+                    // 更新指示器位置
+                    indicator.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+                    
+                    // 计算声像值 (-1 到 1)
+                    const panValue = angle / 150;
+                    
+                    // 更新对应通道的声像
+                    if (channels[channelId].panNode) {
+                        channels[channelId].panNode.pan.value = panValue;
+                    }
+                };
+                
+                dial.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    e.preventDefault();
+                });
+                
+                document.addEventListener('mousemove', (e) => {
+                    if (isDragging) {
+                        updateRotation(e.clientX, e.clientY);
+                    }
+                });
+                
+                document.addEventListener('mouseup', () => {
+                    isDragging = false;
+                });
+                
+                // 点击旋钮直接设置位置
+                dial.addEventListener('click', (e) => {
+                    updateRotation(e.clientX, e.clientY);
                 });
             });
         }
@@ -1684,24 +1751,6 @@
             document.getElementById('active-channels').textContent = activeCount;
         }
 
-        // 删除录音相关的初始化代码
-        function initRecording() {
-            // 不再需要录音初始化
-        }
-
-        // 删除录音相关的函数
-        function startRecording() {
-            // 不再需要录音功能
-        }
-
-        function stopRecording() {
-            // 不再需要录音功能
-        }
-
-        function playRecorded() {
-            // 不再需要录音功能
-        }
-
         // 模式切换
         function initModeSwitcher() {
             const beginnerBtn = document.getElementById('beginner-mode-btn');
@@ -1793,7 +1842,6 @@
             generateChannels();
             initModeSwitcher();
             initLanguageSelector();
-            initRecording();
             updateMeters();
             
             // 播放/停止按钮事件
