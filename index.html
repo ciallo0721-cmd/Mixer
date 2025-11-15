@@ -6,6 +6,27 @@
     <title>专业音频调音台模拟器 - 完整版</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #ff8a00;
+            --secondary-color: #e52e71;
+            --dark-bg: #1a1a2e;
+            --darker-bg: #16213e;
+            --panel-bg: rgba(30, 30, 46, 0.9);
+            --panel-border: rgba(255, 255, 255, 0.1);
+            --text-color: #fff;
+            --text-muted: #a0a0c0;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --info-color: #3498db;
+            --pro-mode-color: #9b59b6;
+            --beginner-mode-color: #3498db;
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            --transition: all 0.3s ease;
+            --border-radius: 10px;
+            --neon-glow: 0 0 10px rgba(255, 138, 0, 0.7), 0 0 20px rgba(255, 138, 0, 0.5), 0 0 30px rgba(255, 138, 0, 0.3);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -14,8 +35,8 @@
         }
 
         body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #fff;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
+            color: var(--text-color);
             min-height: 100vh;
             padding: 20px;
             overflow-x: auto;
@@ -29,68 +50,94 @@
         header {
             text-align: center;
             margin-bottom: 20px;
-            padding: 15px;
+            padding: 20px;
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            z-index: 1;
         }
 
         h1 {
-            font-size: 2.2rem;
-            background: linear-gradient(90deg, #ff8a00, #e52e71);
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
         }
 
         .header-controls {
             display: flex;
-            gap: 15px;
+            gap: 20px;
             align-items: center;
         }
 
         .mode-selector {
             display: flex;
             gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px;
+            border-radius: 30px;
         }
 
         .mode-btn {
-            padding: 8px 20px;
+            padding: 10px 25px;
             border: none;
-            border-radius: 20px;
+            border-radius: 25px;
             font-size: 0.9rem;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
         }
 
         .mode-btn.active {
-            background: linear-gradient(135deg, #ff8a00, #e52e71);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
             box-shadow: 0 0 15px rgba(255, 138, 0, 0.5);
         }
 
         .mode-btn:not(.active) {
-            background: rgba(255, 255, 255, 0.1);
-            color: #a0a0c0;
+            background: transparent;
+            color: var(--text-muted);
         }
 
         .mode-btn:not(.active):hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
         }
 
         .language-selector {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             background: rgba(255, 255, 255, 0.1);
-            padding: 8px 15px;
-            border-radius: 20px;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: var(--transition);
+        }
+
+        .language-selector:hover {
+            background: rgba(255, 255, 255, 0.15);
         }
 
         .language-selector select {
@@ -103,14 +150,185 @@
         }
 
         .language-selector select option {
-            background: #1a1a2e;
+            background: var(--dark-bg);
             color: white;
+        }
+
+        /* 新增音乐信息面板样式 */
+        .music-info-panel {
+            background: var(--panel-bg);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--panel-border);
+            display: flex;
+            gap: 25px;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .music-info-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .music-cover {
+            width: 150px;
+            height: 150px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #2c3e50, #4a6491);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .music-cover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.1) 100%);
+        }
+
+        .music-cover i {
+            font-size: 3rem;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .music-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .music-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .music-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .music-artist {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+
+        .music-stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 10px;
+        }
+
+        .music-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--info-color);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .music-progress {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            width: 0%;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .progress-time {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .music-analysis {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .analysis-item {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .analysis-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--success-color);
+        }
+
+        .analysis-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 5px;
         }
 
         .mixer-container {
             display: flex;
             gap: 20px;
             margin-bottom: 20px;
+            transition: var(--transition);
         }
 
         .channels-section {
@@ -120,26 +338,60 @@
 
         .channels-container {
             display: flex;
-            gap: 15px;
+            gap: 20px;
             overflow-x: auto;
-            padding: 10px 5px;
+            padding: 15px 10px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) rgba(255, 255, 255, 0.1);
+        }
+
+        .channels-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .channels-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .channels-container::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
         }
 
         .channel {
-            background: rgba(30, 30, 46, 0.9);
-            border-radius: 8px;
-            padding: 15px;
-            width: 140px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s, box-shadow 0.3s;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--panel-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            width: 160px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid var(--panel-border);
             display: flex;
             flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .channel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .channel.active::before {
+            transform: scaleX(1);
         }
 
         .channel:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
         }
 
         .channel-header {
@@ -148,31 +400,42 @@
             align-items: center;
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid var(--panel-border);
         }
 
         .channel-title {
             font-size: 1.1rem;
             font-weight: bold;
-            color: #ff8a00;
+            color: var(--primary-color);
         }
 
         .channel-meter {
-            width: 8px;
-            height: 80px;
+            width: 10px;
+            height: 100px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
+            border-radius: 5px;
             overflow: hidden;
             position: relative;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
         }
 
         .channel-meter-level {
             position: absolute;
             bottom: 0;
             width: 100%;
-            background: linear-gradient(to top, #00ff00, #ffff00, #ff0000);
-            transition: height 0.1s;
+            background: linear-gradient(to top, var(--success-color), var(--warning-color), var(--danger-color));
+            transition: height 0.05s;
             height: 0%;
+            border-radius: 0 0 5px 5px;
+        }
+
+        .channel-meter-peak {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: white;
+            transition: bottom 0.1s;
+            bottom: 0;
         }
 
         .channel-controls {
@@ -193,52 +456,91 @@
             text-align: center;
             margin-bottom: 10px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: var(--transition);
             font-size: 0.7rem;
-            height: 50px;
+            height: 60px;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .drop-zone::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(76, 175, 80, 0);
+            transition: var(--transition);
+            z-index: 0;
         }
 
         .drop-zone:hover {
-            border-color: #4CAF50;
+            border-color: var(--success-color);
+        }
+
+        .drop-zone:hover::before {
             background: rgba(76, 175, 80, 0.1);
         }
 
         .drop-zone p {
             margin: 2px 0;
+            position: relative;
+            z-index: 1;
         }
 
         .drop-zone .file-icon {
-            font-size: 1rem;
+            font-size: 1.2rem;
             margin-bottom: 5px;
-            color: #4CAF50;
+            color: var(--success-color);
+            position: relative;
+            z-index: 1;
         }
 
         .mic-btn {
-            background: linear-gradient(135deg, #3498db, #2980b9);
+            background: linear-gradient(135deg, var(--info-color), #2980b9);
             border: none;
             color: white;
-            padding: 6px 10px;
+            padding: 8px 12px;
             text-align: center;
             text-decoration: none;
             display: block;
-            font-size: 0.7rem;
+            font-size: 0.8rem;
             margin: 5px auto 0;
             cursor: pointer;
-            border-radius: 15px;
-            transition: all 0.3s;
+            border-radius: 20px;
+            transition: var(--transition);
             width: 90%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mic-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .mic-btn:hover::before {
+            left: 100%;
         }
 
         .mic-btn:hover {
-            background: linear-gradient(135deg, #2980b9, #3498db);
+            background: linear-gradient(135deg, #2980b9, var(--info-color));
             transform: scale(1.05);
         }
 
         .mic-btn.active {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            background: linear-gradient(135deg, var(--danger-color), #c0392b);
+            box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
         }
 
         .control-group {
@@ -247,13 +549,14 @@
 
         .control-label {
             font-size: 0.75rem;
-            color: #a0a0c0;
+            color: var(--text-muted);
             margin-bottom: 5px;
             text-align: center;
+            font-weight: 500;
         }
 
         .fader {
-            height: 120px;
+            height: 140px;
             width: 100%;
             position: relative;
             display: flex;
@@ -261,27 +564,35 @@
         }
 
         .fader-track {
-            width: 6px;
+            width: 8px;
             height: 100%;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
+            border-radius: 4px;
             position: relative;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
         }
 
         .fader-thumb {
-            width: 20px;
-            height: 12px;
-            background: #ff8a00;
-            border-radius: 3px;
+            width: 24px;
+            height: 14px;
+            background: var(--primary-color);
+            border-radius: 4px;
             position: absolute;
-            left: -7px;
+            left: -8px;
             cursor: pointer;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+            z-index: 2;
+        }
+
+        .fader-thumb:hover {
+            background: #ff9a3d;
+            box-shadow: 0 2px 8px rgba(255, 138, 0, 0.5);
         }
 
         .knob {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             margin: 0 auto;
             position: relative;
         }
@@ -294,59 +605,102 @@
             border: 2px solid #555;
             position: relative;
             box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
         }
 
         .knob-indicator {
-            width: 2px;
-            height: 15px;
-            background: #ff8a00;
+            width: 3px;
+            height: 18px;
+            background: var(--primary-color);
             position: absolute;
-            top: 3px;
+            top: 5px;
             left: 50%;
             transform: translateX(-50%);
             transform-origin: bottom center;
+            border-radius: 2px;
+        }
+
+        .knob-value {
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--text-muted);
         }
 
         .button-group {
             display: flex;
             justify-content: space-between;
             margin-top: 10px;
+            gap: 5px;
         }
 
         .channel-btn {
             background: rgba(255, 255, 255, 0.1);
             border: none;
             color: white;
-            padding: 6px 10px;
+            padding: 8px 12px;
             text-align: center;
             text-decoration: none;
             display: inline-block;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             cursor: pointer;
-            border-radius: 12px;
-            transition: all 0.3s;
+            border-radius: 15px;
+            transition: var(--transition);
             flex: 1;
             margin: 0 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .channel-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0);
+            transition: var(--transition);
+        }
+
+        .channel-btn:hover::before {
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .channel-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
         }
 
         .channel-btn.active {
-            background: #ff8a00;
+            background: var(--primary-color);
+            box-shadow: 0 0 10px rgba(255, 138, 0, 0.5);
         }
 
         .master-section {
             flex: 1;
-            min-width: 350px;
-            background: rgba(30, 30, 46, 0.9);
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 380px;
+            background: var(--panel-bg);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--panel-border);
             display: flex;
             flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .master-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
         }
 
         .master-controls {
@@ -354,39 +708,48 @@
         }
 
         .master-title {
-            color: #ff8a00;
+            color: var(--primary-color);
             margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--panel-border);
             text-align: center;
-            font-size: 1.5rem;
+            font-size: 1.6rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .master-fader {
-            height: 200px;
-            width: 60px;
+            height: 220px;
+            width: 70px;
             margin: 0 auto 20px;
             position: relative;
         }
 
         .master-fader-track {
-            width: 10px;
+            width: 12px;
             height: 100%;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
+            border-radius: 6px;
             position: relative;
             margin: 0 auto;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
         }
 
         .master-fader-thumb {
-            width: 30px;
-            height: 20px;
-            background: #ff8a00;
-            border-radius: 5px;
+            width: 35px;
+            height: 22px;
+            background: var(--primary-color);
+            border-radius: 6px;
             position: absolute;
-            left: -10px;
+            left: -11.5px;
             cursor: pointer;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+            z-index: 2;
+        }
+
+        .master-fader-thumb:hover {
+            background: #ff9a3d;
+            box-shadow: 0 2px 8px rgba(255, 138, 0, 0.5);
         }
 
         .eq-section {
@@ -394,15 +757,16 @@
         }
 
         .eq-title {
-            color: #3498db;
+            color: var(--info-color);
             margin-bottom: 15px;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             text-align: center;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
 
         .eq-bands {
             display: flex;
-            gap: 15px;
+            gap: 20px;
             justify-content: center;
         }
 
@@ -415,16 +779,17 @@
         }
 
         .filter-title {
-            color: #9b59b6;
+            color: var(--pro-mode-color);
             margin-bottom: 15px;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             text-align: center;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
 
         .filter-controls {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
 
         .filter-slider {
@@ -434,12 +799,38 @@
         }
 
         .filter-slider label {
-            font-size: 0.8rem;
-            width: 60px;
+            font-size: 0.85rem;
+            width: 70px;
+            color: var(--text-muted);
         }
 
         .filter-slider input {
             flex: 1;
+            -webkit-appearance: none;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .filter-slider input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .filter-slider input::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            border: none;
         }
 
         .gain-section {
@@ -447,16 +838,17 @@
         }
 
         .gain-title {
-            color: #2ecc71;
+            color: var(--success-color);
             margin-bottom: 15px;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             text-align: center;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
 
         .gain-controls {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
 
         .gain-slider {
@@ -466,112 +858,190 @@
         }
 
         .gain-slider label {
-            font-size: 0.8rem;
-            width: 60px;
+            font-size: 0.85rem;
+            width: 70px;
+            color: var(--text-muted);
         }
 
         .gain-slider input {
             flex: 1;
+            -webkit-appearance: none;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .gain-slider input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--success-color);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .gain-slider input::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: var(--success-color);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            border: none;
         }
 
         .transport-controls {
             display: flex;
-            gap: 10px;
+            gap: 15px;
             margin-top: 20px;
         }
 
         .transport-btn {
             flex: 1;
-            padding: 12px;
+            padding: 14px;
             border: none;
-            border-radius: 5px;
-            font-size: 1rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .transport-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .transport-btn:hover::before {
+            left: 100%;
         }
 
         .play-btn {
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            background: linear-gradient(135deg, var(--success-color), #27ae60);
             color: white;
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
         }
 
         .play-btn:hover {
-            background: linear-gradient(135deg, #27ae60, #2ecc71);
-            transform: scale(1.05);
+            background: linear-gradient(135deg, #27ae60, var(--success-color));
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(46, 204, 113, 0.4);
         }
 
         .stop-btn {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            background: linear-gradient(135deg, var(--danger-color), #c0392b);
             color: white;
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
         }
 
         .stop-btn:hover {
-            background: linear-gradient(135deg, #c0392b, #e74c3c);
-            transform: scale(1.05);
+            background: linear-gradient(135deg, #c0392b, var(--danger-color));
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(231, 76, 60, 0.4);
         }
 
         .status-bar {
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            padding: 15px;
+            border-radius: var(--border-radius);
+            padding: 15px 20px;
             margin-top: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 0.9rem;
+            box-shadow: var(--shadow);
         }
 
         .status-item {
             display: flex;
             align-items: center;
+            gap: 8px;
         }
 
         .status-indicator {
-            width: 10px;
-            height: 10px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
-            margin-right: 8px;
+            margin-right: 5px;
+            position: relative;
         }
 
         .status-active {
-            background: #2ecc71;
-            box-shadow: 0 0 10px #2ecc71;
+            background: var(--success-color);
+            box-shadow: 0 0 10px var(--success-color);
+        }
+
+        .status-active::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 50%;
+            border: 1px solid var(--success-color);
+            animation: pulse 1.5s infinite;
         }
 
         .status-inactive {
-            background: #e74c3c;
+            background: var(--danger-color);
         }
 
         footer {
             text-align: center;
             margin-top: 30px;
-            color: #a0a0c0;
+            color: var(--text-muted);
             font-size: 0.9rem;
+            padding: 15px;
+            border-top: 1px solid var(--panel-border);
         }
 
         /* 专业模式特定样式 */
         .pro-mode .channel {
-            width: 160px;
+            width: 180px;
+            background: rgba(40, 40, 60, 0.9);
+        }
+
+        .pro-mode .channel-title {
+            color: var(--pro-mode-color);
         }
 
         .pro-mode .control-label {
             font-size: 0.7rem;
+            font-weight: bold;
         }
 
         .pro-mode .channel-btn {
             font-size: 0.65rem;
-            padding: 5px 8px;
+            padding: 6px 10px;
         }
 
         .pro-mode .drop-zone {
             font-size: 0.6rem;
-            height: 45px;
+            height: 50px;
         }
 
         .pro-mode .mic-btn {
             font-size: 0.65rem;
-            padding: 5px 8px;
+            padding: 6px 10px;
+        }
+
+        .pro-mode .fader-thumb {
+            background: var(--pro-mode-color);
+        }
+
+        .pro-mode .fader-thumb:hover {
+            background: #a66bbe;
         }
 
         /* 新手模式特定样式 */
@@ -584,9 +1054,20 @@
         }
 
         @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px var(--primary-color); }
+            50% { box-shadow: 0 0 20px var(--primary-color); }
+            100% { box-shadow: 0 0 5px var(--primary-color); }
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         /* 响应式设计 */
@@ -596,6 +1077,19 @@
             }
             
             .channels-container {
+                justify-content: flex-start;
+            }
+            
+            .master-section {
+                min-width: 100%;
+            }
+            
+            .music-info-panel {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .music-stats {
                 justify-content: center;
             }
         }
@@ -619,6 +1113,103 @@
                 width: 100%;
                 justify-content: center;
             }
+            
+            .eq-bands {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .eq-band {
+                width: 100%;
+                max-width: 200px;
+            }
+            
+            .status-bar {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .music-cover {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .music-title {
+                font-size: 1.5rem;
+            }
+            
+            .music-stats {
+                gap: 15px;
+            }
+        }
+
+        /* 工具提示 */
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
+        }
+
+        /* 预设区域 */
+        .presets-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--border-radius);
+        }
+
+        .presets-title {
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .presets-container {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 5px;
+        }
+
+        .preset-btn {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .preset-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .preset-btn.active {
+            background: var(--primary-color);
         }
     </style>
 </head>
@@ -640,6 +1231,61 @@
                 </div>
             </div>
         </header>
+
+        <!-- 新增音乐信息面板 -->
+        <div class="music-info-panel" id="music-info-panel">
+            <div class="music-cover" id="music-cover">
+                <i class="fas fa-music"></i>
+            </div>
+            <div class="music-details">
+                <h2 class="music-title" id="music-title">未选择音频</h2>
+                <p class="music-artist" id="music-artist">拖放音频文件到任意通道开始混音</p>
+                
+                <div class="music-stats">
+                    <div class="music-stat">
+                        <div class="stat-value" id="music-duration">--:--</div>
+                        <div class="stat-label">时长</div>
+                    </div>
+                    <div class="music-stat">
+                        <div class="stat-value" id="music-bitrate">---</div>
+                        <div class="stat-label">码率</div>
+                    </div>
+                    <div class="music-stat">
+                        <!-- <div class="stat-value" id="music-sample-rate"></div>
+                        <div class="stat-label"></div> -->
+                    </div>
+                    <div class="music-stat">
+                        <!-- <div class="stat-value" id="music-channels">--</div>
+                        <div class="stat-label">声道</div> -->
+                    </div>
+                </div>
+                
+                <div class="music-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="music-progress-fill"></div>
+                    </div>
+                    <div class="progress-time">
+                        <span id="current-time">0:00</span>
+                        <span id="total-time">0:00</span>
+                    </div>
+                </div>
+                
+                <div class="music-analysis">
+                    <div class="analysis-item">
+                        <div class="analysis-value" id="music-bpm">---</div>
+                        <div class="analysis-label">BPM</div>
+                    </div>
+                    <div class="analysis-item">
+                        <div class="analysis-value" id="music-key">---</div>
+                        <div class="analysis-label">调性</div>
+                    </div>
+                    <div class="analysis-item">
+                        <div class="analysis-value" id="music-loudness">---</div>
+                        <div class="analysis-label">响度</div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="mixer-container beginner-mode" id="mixer-container">
             <div class="channels-section">
@@ -738,6 +1384,17 @@
                             <i class="fas fa-stop"></i> <span id="stop-btn-text">停止全部</span>
                         </button>
                     </div>
+
+                    <div class="presets-section">
+                        <h3 class="presets-title">预设</h3>
+                        <div class="presets-container">
+                            <button class="preset-btn" data-preset="default">默认</button>
+                            <button class="preset-btn" data-preset="bass-boost">低音增强</button>
+                            <button class="preset-btn" data-preset="treble-boost">高音增强</button>
+                            <button class="preset-btn" data-preset="vocal-enhance">人声增强</button>
+                            <button class="preset-btn" data-preset="live-sound">现场音效</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -822,7 +1479,22 @@
                     'EQ_HIGH': 'EQ HIGH',
                     'PAN': 'PAN',
                     'FADER': 'FADER'
-                }
+                },
+                'presets-title': '预设',
+                'preset-default': '默认',
+                'preset-bass-boost': '低音增强',
+                'preset-treble-boost': '高音增强',
+                'preset-vocal-enhance': '人声增强',
+                'preset-live-sound': '现场音效',
+                'music-no-file': '未选择音频',
+                'music-drop-hint': '拖放音频文件到任意通道开始混音',
+                'music-duration': '时长',
+                'music-bitrate': '码率',
+                'music-sample-rate': '采样率',
+                'music-channels': '声道',
+                'music-bpm': 'BPM',
+                'music-key': '调性',
+                'music-loudness': '响度'
             },
             'en': {
                 'app-title': 'Professional Audio Mixer Simulator',
@@ -852,7 +1524,7 @@
                 'audio-status-text': 'Audio System: Ready',
                 'playback-status-text': 'Playback',
                 'active-channels-label': 'Active Channels:',
-                //'sample-rate-label': 
+                'sample-rate-label': 'Sample Rate: 44.1kHz',
                 'footer-text': 'Professional Audio Mixer Simulator &copy; 2025 | Supports multi-channel mixing, EQ, filters and recording',
                 'channel-prefix': 'Channel',
                 'drop-file-text': 'Drop File',
@@ -879,7 +1551,22 @@
                     'EQ_HIGH': 'EQ HIGH',
                     'PAN': 'PAN',
                     'FADER': 'FADER'
-                }
+                },
+                'presets-title': 'Presets',
+                'preset-default': 'Default',
+                'preset-bass-boost': 'Bass Boost',
+                'preset-treble-boost': 'Treble Boost',
+                'preset-vocal-enhance': 'Vocal Enhance',
+                'preset-live-sound': 'Live Sound',
+                'music-no-file': 'No Audio Selected',
+                'music-drop-hint': 'Drop audio files to any channel to start mixing',
+                'music-duration': 'Duration',
+                'music-bitrate': 'Bitrate',
+                'music-sample-rate': 'Sample Rate',
+                'music-channels': 'Channels',
+                'music-bpm': 'BPM',
+                'music-key': 'Key',
+                'music-loudness': 'Loudness'
             }
         };
 
@@ -892,6 +1579,7 @@
         let channels = {};
         let currentMode = 'beginner';
         let currentLanguage = 'zh-CN';
+        let currentMusicInfo = null;
         
         // 初始化音频上下文
         function initAudio() {
@@ -949,12 +1637,13 @@
                         eqLowNode: null,
                         eqMidNode: null,
                         eqHighNode: null,
-                        filterNode: null
+                        filterNode: null,
+                        meterPeak: 0
                     };
                     
                     // 创建分析器用于电平表
                     channels[channelId].analyser = audioContext.createAnalyser();
-                    channels[channelId].analyser.fftSize = 32;
+                    channels[channelId].analyser.fftSize = 256;
                     
                     // 创建通道EQ节点
                     channels[channelId].eqLowNode = audioContext.createBiquadFilter();
@@ -994,10 +1683,80 @@
                 
                 // 初始化增益控制
                 initGainControls();
+                
+                // 初始化预设
+                initPresets();
+                
+                // 初始化音乐信息面板
+                updateMusicInfoPanel();
             } catch (error) {
                 console.error("音频系统初始化失败:", error);
                 updateAudioStatus(false, translations[currentLanguage]['audio-status-text']);
             }
+        }
+
+        // 更新音乐信息面板
+        function updateMusicInfoPanel(musicInfo = null) {
+            const title = document.getElementById('music-title');
+            const artist = document.getElementById('music-artist');
+            const duration = document.getElementById('music-duration');
+            const bitrate = document.getElementById('music-bitrate');
+            const sampleRate = document.getElementById('music-sample-rate');
+            const channels = document.getElementById('music-channels');
+            const bpm = document.getElementById('music-bpm');
+            const key = document.getElementById('music-key');
+            const loudness = document.getElementById('music-loudness');
+            const progressFill = document.getElementById('music-progress-fill');
+            const currentTime = document.getElementById('current-time');
+            const totalTime = document.getElementById('total-time');
+            
+            if (!musicInfo) {
+                title.textContent = translations[currentLanguage]['music-no-file'];
+                artist.textContent = translations[currentLanguage]['music-drop-hint'];
+                duration.textContent = '--:--';
+                bitrate.textContent = '---';
+                sampleRate.textContent = '';
+                channels.textContent = '--';
+                bpm.textContent = '---';
+                key.textContent = '---';
+                loudness.textContent = '---';
+                progressFill.style.width = '0%';
+                currentTime.textContent = '0:00';
+                totalTime.textContent = '0:00';
+                return;
+            }
+            
+            title.textContent = musicInfo.title || musicInfo.filename || '未知标题';
+            artist.textContent = musicInfo.artist || '未知艺术家';
+            duration.textContent = formatTime(musicInfo.duration || 0);
+            bitrate.textContent = musicInfo.bitrate || '---';
+            sampleRate.textContent = musicInfo.sampleRate || '';
+            channels.textContent = musicInfo.channels || '--';
+            bpm.textContent = musicInfo.bpm || '---';
+            key.textContent = musicInfo.key || '---';
+            loudness.textContent = musicInfo.loudness || '---';
+            progressFill.style.width = '0%';
+            currentTime.textContent = '0:00';
+            totalTime.textContent = formatTime(musicInfo.duration || 0);
+            
+            // 如果有封面图片，更新封面
+            if (musicInfo.cover) {
+                const cover = document.getElementById('music-cover');
+                cover.innerHTML = '';
+                const img = document.createElement('img');
+                img.src = musicInfo.cover;
+                img.alt = '专辑封面';
+                cover.appendChild(img);
+            }
+        }
+
+        // 格式化时间（秒 -> 分:秒）
+        function formatTime(seconds) {
+            if (!seconds || isNaN(seconds)) return '0:00';
+            
+            const min = Math.floor(seconds / 60);
+            const sec = Math.floor(seconds % 60);
+            return `${min}:${sec < 10 ? '0' : ''}${sec}`;
         }
 
         // 初始化主控推子
@@ -1159,6 +1918,118 @@
             });
         }
 
+        // 初始化预设
+        function initPresets() {
+            const presetButtons = document.querySelectorAll('.preset-btn');
+            
+            presetButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const preset = e.target.getAttribute('data-preset');
+                    applyPreset(preset);
+                    
+                    // 更新激活状态
+                    presetButtons.forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                });
+            });
+        }
+
+        // 应用预设
+        function applyPreset(preset) {
+            switch(preset) {
+                case 'default':
+                    // 重置所有设置
+                    filterNode.frequency.value = 1000;
+                    filterNode.Q.value = 1;
+                    filterNode.type = 'lowpass';
+                    eqLowNode.gain.value = 0;
+                    eqMidNode.gain.value = 0;
+                    eqHighNode.gain.value = 0;
+                    masterGainNode.gain.value = 0.8;
+                    
+                    // 更新UI
+                    document.getElementById('filter-freq').value = 1000;
+                    document.getElementById('filter-freq-value').textContent = '1000 Hz';
+                    document.getElementById('filter-q').value = 1;
+                    document.getElementById('filter-q-value').textContent = '1.0';
+                    document.getElementById('filter-type').value = 'lowpass';
+                    document.getElementById('eq-low-value').textContent = '0 dB';
+                    document.getElementById('eq-mid-value').textContent = '0 dB';
+                    document.getElementById('eq-high-value').textContent = '0 dB';
+                    document.getElementById('master-gain').value = 0;
+                    document.getElementById('master-gain-value').textContent = '0 dB';
+                    
+                    // 重置推子位置
+                    document.getElementById('eq-low-thumb').style.top = '50%';
+                    document.getElementById('eq-mid-thumb').style.top = '50%';
+                    document.getElementById('eq-high-thumb').style.top = '50%';
+                    break;
+                    
+                case 'bass-boost':
+                    eqLowNode.gain.value = 8;
+                    eqMidNode.gain.value = 0;
+                    eqHighNode.gain.value = 0;
+                    
+                    document.getElementById('eq-low-value').textContent = '+8.0 dB';
+                    document.getElementById('eq-mid-value').textContent = '0 dB';
+                    document.getElementById('eq-high-value').textContent = '0 dB';
+                    
+                    document.getElementById('eq-low-thumb').style.top = '30%';
+                    document.getElementById('eq-mid-thumb').style.top = '50%';
+                    document.getElementById('eq-high-thumb').style.top = '50%';
+                    break;
+                    
+                case 'treble-boost':
+                    eqLowNode.gain.value = 0;
+                    eqMidNode.gain.value = 0;
+                    eqHighNode.gain.value = 8;
+                    
+                    document.getElementById('eq-low-value').textContent = '0 dB';
+                    document.getElementById('eq-mid-value').textContent = '0 dB';
+                    document.getElementById('eq-high-value').textContent = '+8.0 dB';
+                    
+                    document.getElementById('eq-low-thumb').style.top = '50%';
+                    document.getElementById('eq-mid-thumb').style.top = '50%';
+                    document.getElementById('eq-high-thumb').style.top = '30%';
+                    break;
+                    
+                case 'vocal-enhance':
+                    eqLowNode.gain.value = 2;
+                    eqMidNode.gain.value = 4;
+                    eqHighNode.gain.value = 3;
+                    
+                    document.getElementById('eq-low-value').textContent = '+2.0 dB';
+                    document.getElementById('eq-mid-value').textContent = '+4.0 dB';
+                    document.getElementById('eq-high-value').textContent = '+3.0 dB';
+                    
+                    document.getElementById('eq-low-thumb').style.top = '45%';
+                    document.getElementById('eq-mid-thumb').style.top = '35%';
+                    document.getElementById('eq-high-thumb').style.top = '40%';
+                    break;
+                    
+                case 'live-sound':
+                    filterNode.frequency.value = 8000;
+                    filterNode.type = 'highshelf';
+                    eqLowNode.gain.value = 3;
+                    eqMidNode.gain.value = 1;
+                    eqHighNode.gain.value = 4;
+                    
+                    document.getElementById('filter-freq').value = 8000;
+                    document.getElementById('filter-freq-value').textContent = '8000 Hz';
+                    document.getElementById('filter-type').value = 'highshelf';
+                    document.getElementById('eq-low-value').textContent = '+3.0 dB';
+                    document.getElementById('eq-mid-value').textContent = '+1.0 dB';
+                    document.getElementById('eq-high-value').textContent = '+4.0 dB';
+                    
+                    document.getElementById('eq-low-thumb').style.top = '42%';
+                    document.getElementById('eq-mid-thumb').style.top = '47%';
+                    document.getElementById('eq-high-thumb').style.top = '38%';
+                    break;
+            }
+            
+            updateFilterTypeOptions();
+        }
+
         // 更新音频状态
         function updateAudioStatus(active, text) {
             const statusIndicator = document.getElementById('audio-status');
@@ -1186,6 +2057,7 @@
                             <div class="channel-title">${currentMode === 'pro' ? translations[currentLanguage]['pro-channel-prefix'] : translations[currentLanguage]['channel-prefix']} ${i}</div>
                             <div class="channel-meter">
                                 <div class="channel-meter-level" id="meter-${channelId}"></div>
+                                <div class="channel-meter-peak" id="meter-peak-${channelId}"></div>
                             </div>
                         </div>
                         <div class="input-source">
@@ -1251,6 +2123,7 @@
                                         <div class="knob-dial">
                                             <div class="knob-indicator" style="transform: translateX(-50%) rotate(0deg);"></div>
                                         </div>
+                                        <div class="knob-value">0</div>
                                     </div>
                                 </div>
                                 <div class="control-group">
@@ -1276,6 +2149,7 @@
                                         <div class="knob-dial">
                                             <div class="knob-indicator" style="transform: translateX(-50%) rotate(0deg);"></div>
                                         </div>
+                                        <div class="knob-value">0</div>
                                     </div>
                                 </div>
                                 <div class="control-group">
@@ -1401,6 +2275,10 @@
                     channels[channel].audioBuffer = buffer;
                     channels[channel].isMic = false;
                     channels[channel].file = file;
+                    
+                    // 提取音乐信息并更新面板
+                    extractMusicInfo(file, buffer, channel);
+                    
                     updateActiveChannels();
                     console.log(`音频已加载到 ${channel}`);
                 }, function(e) {
@@ -1408,6 +2286,112 @@
                 });
             };
             reader.readAsArrayBuffer(file);
+        }
+
+        // 提取音乐信息
+        function extractMusicInfo(file, buffer, channel) {
+            // 从文件名中提取标题和艺术家信息（简化处理）
+            const fileName = file.name.replace(/\.[^/.]+$/, ""); // 移除扩展名
+            let title = fileName;
+            let artist = "未知艺术家";
+            
+            // 简单的文件名解析（假设格式为 "艺术家 - 标题" 或 "标题"）
+            if (fileName.includes(" - ")) {
+                const parts = fileName.split(" - ");
+                artist = parts[0];
+                title = parts[1] || title;
+            }
+            
+            // 计算音频属性
+            const duration = buffer.duration;
+            const sampleRate = buffer.sampleRate;
+            const channels = buffer.numberOfChannels;
+            
+            // 计算比特率（简化计算）
+            const fileSizeMB = file.size / (1024 * 1024);
+            const durationMinutes = duration / 60;
+            const bitrate = fileSizeMB > 0 && durationMinutes > 0 ? 
+                Math.round((fileSizeMB * 8) / durationMinutes) + ' kbps' : '---';
+            
+            // 创建音乐信息对象
+            const musicInfo = {
+                filename: file.name,
+                title: title,
+                artist: artist,
+                duration: duration,
+                bitrate: bitrate,
+                sampleRate: (sampleRate / 1000).toFixed(1) + 'kHz',
+                channels: channels,
+                bpm: '---', // 实际BPM检测需要复杂算法
+                key: '---', // 实际调性检测需要复杂算法
+                loudness: '---', // 实际响度检测需要复杂算法
+                cover: null // 在实际应用中，可以从ID3标签提取封面
+            };
+            
+            currentMusicInfo = musicInfo;
+            updateMusicInfoPanel(musicInfo);
+            
+            // 尝试分析音频特征
+            analyzeAudioFeatures(buffer, musicInfo);
+        }
+
+        // 分析音频特征
+        function analyzeAudioFeatures(buffer, musicInfo) {
+            try {
+                // 获取音频数据
+                const channelData = buffer.getChannelData(0); // 使用第一个声道
+                const sampleRate = buffer.sampleRate;
+                
+                // 计算响度（RMS）
+                let sum = 0;
+                for (let i = 0; i < channelData.length; i++) {
+                    sum += channelData[i] * channelData[i];
+                }
+                const rms = Math.sqrt(sum / channelData.length);
+                const loudnessDb = 20 * Math.log10(rms);
+                musicInfo.loudness = loudnessDb.toFixed(1) + ' dB';
+                
+                // 简单的频谱分析
+                const analyser = audioContext.createAnalyser();
+                const bufferSource = audioContext.createBufferSource();
+                bufferSource.buffer = buffer;
+                bufferSource.connect(analyser);
+                
+                analyser.fftSize = 2048;
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                
+                // 获取频率数据
+                analyser.getByteFrequencyData(dataArray);
+                
+                // 计算频谱重心（粗略的频率分布指示）
+                let total = 0;
+                let weightedSum = 0;
+                for (let i = 0; i < bufferLength; i++) {
+                    weightedSum += i * dataArray[i];
+                    total += dataArray[i];
+                }
+                
+                const spectralCentroid = total > 0 ? weightedSum / total : 0;
+                
+                // 根据频谱重心给出粗略的调性提示
+                if (spectralCentroid < bufferLength * 0.25) {
+                    musicInfo.key = '低音域';
+                } else if (spectralCentroid < bufferLength * 0.5) {
+                    musicInfo.key = '中音域';
+                } else {
+                    musicInfo.key = '高音域';
+                }
+                
+                // 更新音乐信息面板
+                updateMusicInfoPanel(musicInfo);
+                
+                // 清理资源
+                bufferSource.disconnect();
+                
+            } catch (error) {
+                console.error("音频特征分析失败:", error);
+            }
         }
 
         // 初始化麦克风按钮
@@ -1421,6 +2405,9 @@
                         const dropZone = document.querySelector(`.drop-zone[data-channel="${channel}"]`);
                         dropZone.innerHTML = `<div class="file-icon">📁</div><p>${currentMode === 'pro' ? translations[currentLanguage]['pro-drop-file-text'] : translations[currentLanguage]['drop-file-text']}</p>`;
                         channels[channel].isMic = false;
+                        
+                        // 清除音乐信息
+                        updateMusicInfoPanel();
                     } else {
                         initMicrophone(channel);
                         e.target.classList.add('active');
@@ -1462,6 +2449,20 @@
                     // 更新UI
                     const dropZone = document.querySelector(`.drop-zone[data-channel="${channel}"]`);
                     dropZone.innerHTML = `<div class="file-icon">🎤</div><p>${currentMode === 'pro' ? translations[currentLanguage]['pro-mic-active-text'] : translations[currentLanguage]['mic-active-text']}</p>`;
+                    
+                    // 更新音乐信息面板显示麦克风信息
+                    const micInfo = {
+                        title: '麦克风输入',
+                        artist: '实时音频',
+                        duration: 0,
+                        bitrate: '---',
+                        sampleRate: '44.1kHz',
+                        channels: 1,
+                        bpm: '---',
+                        key: '---',
+                        loudness: '---'
+                    };
+                    updateMusicInfoPanel(micInfo);
                     
                     updatePlaybackStatus();
                     console.log(`麦克风连接到 ${channel}`);
@@ -1557,6 +2558,7 @@
             document.querySelectorAll('.knob').forEach(knob => {
                 const dial = knob.querySelector('.knob-dial');
                 const indicator = knob.querySelector('.knob-indicator');
+                const valueDisplay = knob.querySelector('.knob-value');
                 const channelElement = knob.closest('.channel');
                 
                 if (!channelElement) return; // 跳过主控部分的旋钮
@@ -1588,6 +2590,11 @@
                     
                     // 计算声像值 (-1 到 1)
                     const panValue = angle / 150;
+                    
+                    // 更新显示值
+                    if (valueDisplay) {
+                        valueDisplay.textContent = panValue.toFixed(1);
+                    }
                     
                     // 更新对应通道的声像
                     if (channels[channelId].panNode) {
@@ -1634,13 +2641,39 @@
             for (let i = 1; i <= 8; i++) {
                 const channelId = `ch${i}`;
                 const meter = document.getElementById(`meter-${channelId}`);
+                const peakMeter = document.getElementById(`meter-peak-${channelId}`);
                 
-                // 模拟电平表动画
-                if (channels[channelId].isPlaying) {
-                    const randomLevel = Math.random() * 80 + 10; // 10-90%
-                    meter.style.height = `${randomLevel}%`;
+                if (channels[channelId].isPlaying && channels[channelId].analyser) {
+                    const dataArray = new Uint8Array(channels[channelId].analyser.frequencyBinCount);
+                    channels[channelId].analyser.getByteFrequencyData(dataArray);
+                    
+                    // 计算平均音量
+                    let sum = 0;
+                    for (let j = 0; j < dataArray.length; j++) {
+                        sum += dataArray[j];
+                    }
+                    const average = sum / dataArray.length;
+                    
+                    // 转换为百分比
+                    const level = Math.min(100, (average / 256) * 100);
+                    
+                    // 更新电平表
+                    meter.style.height = `${level}%`;
+                    
+                    // 更新峰值
+                    if (level > channels[channelId].meterPeak) {
+                        channels[channelId].meterPeak = level;
+                    } else {
+                        // 缓慢下降峰值
+                        channels[channelId].meterPeak = Math.max(level, channels[channelId].meterPeak - 0.5);
+                    }
+                    
+                    // 更新峰值指示器
+                    peakMeter.style.bottom = `${channels[channelId].meterPeak}%`;
                 } else {
                     meter.style.height = '0%';
+                    channels[channelId].meterPeak = 0;
+                    peakMeter.style.bottom = '0%';
                 }
             }
             
@@ -1822,6 +2855,13 @@
             document.getElementById('active-channels-label').textContent = translations[currentLanguage]['active-channels-label'];
             document.getElementById('sample-rate-label').textContent = translations[currentLanguage]['sample-rate-label'];
             document.getElementById('footer-text').textContent = translations[currentLanguage]['footer-text'];
+            document.getElementById('presets-title').textContent = translations[currentLanguage]['presets-title'];
+            
+            // 更新预设按钮文本
+            document.querySelectorAll('.preset-btn').forEach(button => {
+                const preset = button.getAttribute('data-preset');
+                button.textContent = translations[currentLanguage][`preset-${preset}`];
+            });
             
             // 更新模式按钮文本
             updateUIForCurrentMode();
@@ -1834,6 +2874,36 @@
             
             // 更新播放状态
             updatePlaybackStatus();
+            
+            // 更新音乐信息面板标签
+            document.querySelectorAll('.stat-label').forEach((label, index) => {
+                const labels = [
+                    translations[currentLanguage]['music-duration'],
+                    translations[currentLanguage]['music-bitrate'],
+                    translations[currentLanguage]['music-sample-rate'],
+                    translations[currentLanguage]['music-channels']
+                ];
+                if (index < labels.length) {
+                    label.textContent = labels[index];
+                }
+            });
+            
+            document.querySelectorAll('.analysis-label').forEach((label, index) => {
+                const labels = [
+                    translations[currentLanguage]['music-bpm'],
+                    translations[currentLanguage]['music-key'],
+                    translations[currentLanguage]['music-loudness']
+                ];
+                if (index < labels.length) {
+                    label.textContent = labels[index];
+                }
+            });
+            
+            // 更新音乐信息面板默认文本
+            if (!currentMusicInfo) {
+                document.getElementById('music-title').textContent = translations[currentLanguage]['music-no-file'];
+                document.getElementById('music-artist').textContent = translations[currentLanguage]['music-drop-hint'];
+            }
         }
 
         // 页面加载完成后初始化
